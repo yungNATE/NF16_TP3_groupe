@@ -4,6 +4,7 @@
 
 int main()
 {
+    
     T_Magasin *mon_magasin = NULL;
 
     // ============= MENU UTILISATEUR ============= */
@@ -22,7 +23,7 @@ int main()
         printf("\n======================================");
         printf("\n   Votre choix ? ");
         choix = getchar();
-        viderBuffer(); // supprimer de l'entrée standard le retour charriot et les éventuels caractères supplémentaires tapés par l'utilisateur
+        viderBuffer(); // supprimer de l'entrï¿½e standard le retour charriot et les ï¿½ventuels caractï¿½res supplï¿½mentaires tapï¿½s par l'utilisateur
 
         switch (choix) {
             case '1' :
