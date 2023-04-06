@@ -2,18 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tp3.h"
-
+//AAAAAAAAAAAAAAAAAAAAAAg
 
 /* **********************************
- * Création et initialisation Produit
+ * Crï¿½ation et initialisation Produit
  ********************************** */
 T_Produit *creerProduit(char *designation, float prix, int quantite) {
     T_Produit *nouveauProduit = NULL;
 
     nouveauProduit = malloc(sizeof(T_Produit));
     if (nouveauProduit != NULL) {
-        // l'allocation mémoire s'est bien passée
-        nouveauProduit->designation = malloc(strlen(designation) + 1); // Important : malloc permet d'avoir l'espace mémoire dédié pour notre champ de structure
+        // l'allocation mï¿½moire s'est bien passï¿½e
+        nouveauProduit->designation = malloc(strlen(designation) + 1); // Important : malloc permet d'avoir l'espace mï¿½moire dï¿½diï¿½ pour notre champ de structure
         strcpy(nouveauProduit->designation,designation);
         nouveauProduit->prix = prix;
         nouveauProduit->quantite_en_stock = quantite;
@@ -26,14 +26,14 @@ T_Produit *creerProduit(char *designation, float prix, int quantite) {
 
 
 /* ********************************
- * Création et initialisation Rayon
+ * Crï¿½ation et initialisation Rayon
  ******************************** */
 T_Rayon *creerRayon(char *nom) {
     T_Rayon *nouveauRayon = NULL;
 
     nouveauRayon = malloc(sizeof(T_Rayon));
     if (nouveauRayon != NULL) {
-        // l'allocation mémoire s'est bien passée
+        // l'allocation mï¿½moire s'est bien passï¿½e
         nouveauRayon->nom_rayon = malloc(strlen(nom) + 1);
         strcpy(nouveauRayon->nom_rayon,nom);
         nouveauRayon->liste_produits = NULL;
@@ -46,7 +46,7 @@ T_Rayon *creerRayon(char *nom) {
 
 
 /* **********************************
- * Création et initialisation Magasin
+ * Crï¿½ation et initialisation Magasin
  ********************************** */
 T_Magasin *creerMagasin(char *nom) {
     T_Magasin *nouveauMagasin = NULL;
@@ -122,7 +122,7 @@ int supprimerRayon(T_Magasin *magasin, char *nom_rayon) {
 
 
 /* **************************************************************************************
- * Recherche des produits se situant dans une fourchette de prix entrée par l'utilisateur
+ * Recherche des produits se situant dans une fourchette de prix entrï¿½e par l'utilisateur
  ************************************************************************************** */
 void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
     // TODO
