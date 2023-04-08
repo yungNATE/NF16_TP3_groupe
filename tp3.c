@@ -67,7 +67,42 @@ T_Magasin *creerMagasin(char *nom) {
  * Ajout d'un rayon dans un magasin
  ******************************** */
 int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
-    // TODO
+    if (magasin == NULL)
+    {
+        printf("Magasin inexistant.\n");
+    }
+
+    T_Rayon *precedent = NULL;
+    T_Rayon *current = magasin->liste_rayons;
+
+    // On parcourt toute la liste jusqu'à trouver un mot plus grand ou la fin de la liste
+    while (current != NULL && strcmp(current->nom_rayon, nomRayon) < 0)
+    {
+        precedent = current;
+        current = current->suivant;
+    }
+
+    // Test si rayon existe déjà
+    if (current != NULL && strcmp(current->nom_rayon, nomRayon) == 0)
+    {
+        printf("Le rayon existe déjà.\n");
+        return 0;
+    }
+
+    // Ok pour insérer 
+
+    T_Rayon *nouveau = creerRayon(nomRayon);
+
+    if (precedent == NULL)
+    {
+        magasin->liste_rayons = nouveau;
+    }
+    else
+    {
+        precedent->suivant = nouveau;
+    }
+
+    nouveau->suivant = current; // Pour bien marquer la fin
     return 1;
 }
 
@@ -126,7 +161,91 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
  * Affichage de tous les rayons d'un magasin
  ***************************************** */
 void afficherMagasin(T_Magasin *magasin) {
-    // TODO
+    T_Rayon *current;
+    current = magasin->liste_rayons;
+
+    if (magasin == NULL)
+    {
+        printf("Magasin inexistant.");
+    }
+    
+
+    int nb_produits;
+    T_Produit *produit;
+
+    if (current == NULL)
+    {
+        printf("Magasin vide.\n");
+    }
+
+    else
+    {   
+        // Pour avoir une table sympa on va calculer la longueur du mot le plus long
+        int max = 0;
+        while (current != NULL)
+        {   
+            if (strlen(current->nom_rayon) > max)
+            {
+                max = strlen(current->nom_rayon);
+            }
+            current = current->suivant;
+        }
+        printf("+");
+        for (int k = 0; k < max*1.5; k++)
+        {
+            printf("-");
+        }
+        printf("+");
+        for (int k = 0; k < strlen(" Nombre de produits") + 1; k++)
+        {
+            printf("-");
+        }
+        printf(("+\n"));
+        printf("| Nom du rayon");
+        for (int k = 0; k < max*1.5 - strlen("| Nom du rayon") + 1; k++)
+        {
+            printf(" ");
+        }
+        printf("|");
+        printf(" Nombre de produits ");
+        printf("|\n");
+        printf("+");
+        for (int k = 0; k < max*1.5; k++)
+        {
+            printf("-");
+        }
+        printf("+");
+        for (int k = 0; k < strlen(" Nombre de produits") + 1; k++)
+        {
+            printf("-");
+        }
+        printf(("+\n"));
+
+        current = magasin->liste_rayons; // Car current a été itéré
+
+        while (current != NULL)
+        {   
+            produit = current->liste_produits;
+            nb_produits = 0;
+            // while (produit->suivant != NULL)
+            // {
+            //     nb_produits++;
+            // }
+            printf("| %s", current->nom_rayon);
+            for (int k = 0; k < 1.5*max - strlen(current->nom_rayon) - 1; k++)
+            {
+                printf(" ");
+            }
+            printf("| ");
+            printf("%d", nb_produits);
+            for (int k = 0; k < strlen(" Nombre de produits") - getNumLength(nb_produits) - 1; k++)
+            {
+                printf(" ");
+            }
+            printf("|\n");
+            current = current->suivant;
+        }
+    }
 }
 
 
@@ -135,7 +254,7 @@ void afficherMagasin(T_Magasin *magasin) {
  * Affichage de tous les produits d'un rayon
  ***************************************** */
 void afficherRayon(T_Rayon *rayon) {
-    // TODO
+    // TO DO
 }
 
 
@@ -187,4 +306,15 @@ void viderBuffer() {
     while (c != '\n' && c != EOF) {
         c = getchar();
     }
+}
+
+// Longueur d'un integer (utile pour générer un beau tableau)
+
+int getNumLength(int num) {
+    int length = 0;
+    while (num != 0) {
+        num /= 10;
+        ++length;
+    }
+    return length;
 }
