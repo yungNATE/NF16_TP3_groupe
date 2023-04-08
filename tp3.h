@@ -55,7 +55,11 @@ void fusionnerRayons(T_Magasin *magasin);
 
 
 // UTILS
+    // proc
 void viderBuffer();
+void clear_screen();
+
+    // func
 int getNumLength(int num);
 
 #endif // TP3_H_INCLUDED
