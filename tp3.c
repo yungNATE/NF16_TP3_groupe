@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "tp3.h"
 
 
@@ -111,7 +112,7 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
  * Ajout d'un produit dans un rayon
  ******************************** */
 int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
-    if(quantite <= 0) return NULL;
+    //if(quantite <= 0) return NULL; // TODO : vérifier pourquoi cette ligne lève un warning. Au pire on la vire mais c'est dommage
 
     //* Vérification si le produit existe déjà dans le rayon
     T_Produit *produit = rayon->liste_produits;
@@ -291,6 +292,19 @@ void fusionnerRayons(T_Magasin *magasin) {
 }
 
 
+/* ******************************
+ * Vérifier si le magasin existe
+ ****************************** */
+bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
+    bool isStoreSet = (bool) magasin;
+
+    if(! isStoreSet) {
+        printf("\nAucun magasin n'existe ! ");
+        return false;
+    }
+
+    return true;
+}
 
 /* *********************
  * Fonctions utilitaires

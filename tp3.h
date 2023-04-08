@@ -53,6 +53,9 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max);
 // Fusionner deux rayons
 void fusionnerRayons(T_Magasin *magasin);
 
+// Vérifier si le magasin existe. Peut afficher un msg dans l'invite au besoin.
+bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser);
+
 
 // UTILS
     // proc

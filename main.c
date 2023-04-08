@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <stdbool.h>
 #include "tp3.h"
 #include "tp3.c"
 
@@ -33,7 +34,7 @@ int main(void)
         switch (choix) {
             case '1' : // Créer magasin
 
-                if(mon_magasin != NULL) {
+                if(mon_magasin != NULL) { // Si le magasin existe déjà
                     printf("\nUn magasin existe déjà ! ");
 
     
@@ -62,12 +63,42 @@ int main(void)
 
             case '2' : // Ajouter rayon
 
+                // si aucun magasin n'existe
+                if(! isStoreSet(mon_magasin, true)) break;
+
+                // récupération de l'input
+                printf("\nNom du rayon ? ");
+                char nomRayon[50];
+                scanf("%s", nomRayon);
+                viderBuffer();
+
+                // création
+                ajouterRayon(mon_magasin, nomRayon);
+                
+
                 break;
 
             case '3' : // Ajouter produit
+
+                // si aucun magasin n'existe
+                if(! isStoreSet(mon_magasin, true)) break;
+
+                // récupération de l'input
+
+
+                //création
+
+
+
                 break;
 
             case '4' : // Afficher rayons
+
+                // si aucun magasin n'existe
+                if(! isStoreSet(mon_magasin, true)) break;
+                
+                afficherMagasin(mon_magasin);
+
                 break;
 
             case '5' : // Afficher produits
