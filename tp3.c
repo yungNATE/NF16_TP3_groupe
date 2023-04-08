@@ -77,8 +77,47 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
  * Ajout d'un produit dans un rayon
  ******************************** */
 int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
-    // TODO
-    return 1;
+
+    // // Vérification si le produit existe déjà dans le rayon
+    // T_Produit *produit = rayon->premierProduit;
+    // while (produit != NULL) {
+    //     if (strcmp(produit->designation, designation) == 0) {
+    //         return 0; // Le produit existe déjà, on ne peut pas l'ajouter
+    //     }
+    //     produit = produit->produitSuivant;
+    // }
+
+    // // Création du nouveau produit
+    // T_Produit *nouveauProduit = (T_Produit*) malloc(sizeof(T_Produit));
+    // if (nouveauProduit == NULL) {
+    //     return 0; // Echec de l'allocation de mémoire
+    // }
+    // nouveauProduit->designation = (char*) malloc(sizeof(char) * (strlen(designation) + 1));
+    // if (nouveauProduit->designation == NULL) {
+    //     free(nouveauProduit);
+    //     return 0; // Echec de l'allocation de mémoire
+    // }
+    // strcpy(nouveauProduit->designation, designation);
+    // nouveauProduit->prix = prix;
+    // nouveauProduit->quantite = quantite;
+
+    // // Insertion du nouveau produit dans le rayon, en respectant l'ordre croissant des prix
+    // T_Produit *produitCourant = rayon->premierProduit;
+    // T_Produit *produitPrecedent = NULL;
+    // while (produitCourant != NULL && produitCourant->prix < prix) {
+    //     produitPrecedent = produitCourant;
+    //     produitCourant = produitCourant->produitSuivant;
+    // }
+    // if (produitPrecedent == NULL) {
+    //     nouveauProduit->produitSuivant = rayon->premierProduit;
+    //     rayon->premierProduit = nouveauProduit;
+    // } 
+    // else {
+    //     nouveauProduit->produitSuivant = produitCourant;
+    //     produitPrecedent->produitSuivant = nouveauProduit;
+    // }
+
+    // return 1; // Succès de l'ajout
 }
 
 
