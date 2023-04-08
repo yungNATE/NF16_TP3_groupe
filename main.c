@@ -56,15 +56,6 @@ int main(void)
                 char nom[50];
                 scanf("%s", nom);
                 viderBuffer();
-                //! : tests effectués avec 1 bizarrerie
-                /*
-                    premier passage en entrant "1" : tout va bien, je créé le magasin
-                    deuxième passage en entrant "1" : je tombe dans le cas default du switch général comme si j'avais entré autre chose qu'une valeur [1-9]
-                    3...n passages en entrant "1" : tout va bien, je renomme le magasin
-
-                    Je soupsonne un buffer mal vidé à cause de "scanf("%s", nom);"
-
-                */
                 mon_magasin = creerMagasin(nom);
                 printf("\nMagasin %s créé ! ", mon_magasin->nom);
                 break;
