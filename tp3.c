@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "tp3.h"
 
 #define MAX_LEN_QTE 15
@@ -11,17 +12,20 @@
  * Cr�ation et initialisation Produit
  ********************************** */
 T_Produit *creerProduit(char *designation, float prix, int quantite) {
+    if(quantite <= 0) return NULL;
+
+
     T_Produit *nouveauProduit = NULL;
 
     nouveauProduit = malloc(sizeof(T_Produit));
-    if (nouveauProduit != NULL) {
-        // l'allocation m�moire s'est bien pass�e
-        nouveauProduit->designation = malloc(strlen(designation) + 1); // Important : malloc permet d'avoir l'espace m�moire d�di� pour notre champ de structure
-        strcpy(nouveauProduit->designation,designation);
-        nouveauProduit->prix = prix;
-        nouveauProduit->quantite_en_stock = quantite;
-        nouveauProduit->suivant = NULL;
-    }
+    if (nouveauProduit == NULL) return NULL; // l'allocation mémoire n'a pas pu se faire
+
+
+    nouveauProduit->designation = malloc(strlen(designation) + 1); // Important : malloc permet d'avoir l'espace mémoire dédié pour notre champ de structure
+    strcpy(nouveauProduit->designation,designation);
+    nouveauProduit->prix = prix;
+    nouveauProduit->quantite_en_stock = quantite;
+    nouveauProduit->suivant = NULL;
 
     return nouveauProduit;
 }
@@ -70,23 +74,23 @@ T_Magasin *creerMagasin(char *nom) {
  * Ajout d'un rayon dans un magasin
  ******************************** */
 int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
-    if (magasin == NULL)
-    {
-        printf("Magasin inexistant.\n");
-    }
+    // TODO : Attention à bien vérifier toutes les valeurs que peut prendre "magasin"
 
-    T_Rayon *precedent = NULL;
-    T_Rayon *current = magasin->liste_rayons;
+    if (magasin == NULL) printf("Magasin inexistant.\n");
+
+
+    T_Rayon *rayonPrecedent = NULL;
+    T_Rayon *rayonCourant = magasin->liste_rayons;
 
     // On parcourt toute la liste jusqu'à trouver un mot plus grand ou la fin de la liste
-    while (current != NULL && strcmp(current->nom_rayon, nomRayon) < 0)
+    while (rayonCourant != NULL && strcmp(rayonCourant->nom_rayon, nomRayon) < 0)
     {
-        precedent = current;
-        current = current->suivant;
+        rayonPrecedent = rayonCourant;
+        rayonCourant = rayonCourant->suivant;
     }
 
     // Test si rayon existe déjà
-    if (current != NULL && strcmp(current->nom_rayon, nomRayon) == 0)
+    if (rayonCourant != NULL && strcmp(rayonCourant->nom_rayon, nomRayon) == 0)
     {
         printf("Le rayon existe déjà.\n");
         return 0;
@@ -94,18 +98,14 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
 
     // Ok pour insérer 
 
-    T_Rayon *nouveau = creerRayon(nomRayon);
+    T_Rayon *nouveauRayon = creerRayon(nomRayon);
 
-    if (precedent == NULL)
-    {
-        magasin->liste_rayons = nouveau;
-    }
+    if(rayonPrecedent == NULL)
+        magasin->liste_rayons = nouveauRayon;
     else
-    {
-        precedent->suivant = nouveau;
-    }
+        rayonPrecedent->suivant = nouveauRayon;
 
-    nouveau->suivant = current; // Pour bien marquer la fin
+    nouveauRayon->suivant = rayonCourant; // Pour bien marquer la fin
     return 1;
 }
 
@@ -115,8 +115,43 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
  * Ajout d'un produit dans un rayon
  ******************************** */
 int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
-    // TODO
-    return 1;
+    //if(quantite <= 0) return NULL; // TODO : vérifier pourquoi cette ligne lève un warning. Au pire on la vire mais c'est dommage
+
+    //* Vérification si le produit existe déjà dans le rayon
+    T_Produit *produit = rayon->liste_produits;
+    while (produit != NULL) {
+        if (strcmp(produit->designation, designation) == 0) {
+            // Le produit existe déjà, on augmente simplement sa quantite
+            produit->quantite_en_stock += quantite;
+            return 0;
+        }
+        produit = produit->suivant;
+    }
+
+
+    //* Création du nouveau produit
+    T_Produit *nouveauProduit = creerProduit(designation, prix, quantite);
+
+
+    //* Insertion du nouveau produit dans le rayon, en respectant l'ordre croissant des prix
+    T_Produit *produitPrecedent = NULL;
+    T_Produit *produitCourant = rayon->liste_produits;
+
+    // tant qu'on trouve un prix inférieur au produit courant, on avance dans le rayon 
+    while (produitCourant != NULL && produitCourant->prix < prix) {
+        produitPrecedent = produitCourant;
+        produitCourant = produitCourant->suivant;
+    }
+
+    // On vient de dépasser le dernier produit au prix < au prix courant. On insère 
+    if(produitPrecedent == NULL)
+        rayon->liste_produits = nouveauProduit;
+    else
+        produitPrecedent->suivant = nouveauProduit;
+
+    nouveauProduit->suivant = produitCourant; // Pour bien marquer la fin
+
+    return 1; // Succès de l'ajout
 }
 
 
@@ -365,6 +400,19 @@ void fusionnerRayons(T_Magasin *magasin) {
 }
 
 
+/* ******************************
+ * Vérifier si le magasin existe
+ ****************************** */
+bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
+    bool isStoreSet = (bool) magasin;
+
+    if(! isStoreSet) {
+        printf("\nAucun magasin n'existe ! ");
+        return false;
+    }
+
+    return true;
+}
 
 /* *********************
  * Fonctions utilitaires
@@ -377,8 +425,12 @@ void viderBuffer() {
     }
 }
 
-// Longueur d'un integer (utile pour générer un beau tableau)
+// Fonction pour vider l'écran (normalement imlémentée via de base clrscr(), mais ne fonctionne pas)
+void clear_screen(){
+    printf("\e[1;1H\e[2J");
+}
 
+// Longueur d'un integer (utile pour générer un beau tableau)
 int getNumLength(int num) {
     int length = 0;
     while (num != 0) {
@@ -387,3 +439,4 @@ int getNumLength(int num) {
     }
     return length;
 }
+
