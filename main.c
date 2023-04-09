@@ -61,5 +61,12 @@ int main(void)
     //     printf("\n\n\n");
     // }
 
+    T_Magasin *magasin = creerMagasin("Magasin Test");
+
+    ajouterRayon(magasin, "Rayon Test");
+    
+    afficherRayon(magasin->liste_rayons);
+
+
     return 0;
 }

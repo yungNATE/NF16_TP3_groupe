@@ -1,5 +1,7 @@
 #ifndef TP3_H_INCLUDED
 #define TP3_H_INCLUDED
+#define MAX_LEN_QTE 15
+#define MAX_LEN_PRIX 15
 
 // Structures et types
 struct Produit {
@@ -57,5 +59,7 @@ void fusionnerRayons(T_Magasin *magasin);
 // UTILS
 void viderBuffer();
 int getNumLength(int num);
+
+
 
 #endif // TP3_H_INCLUDED
