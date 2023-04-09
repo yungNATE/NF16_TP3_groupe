@@ -1,7 +1,7 @@
 #ifndef TP3_H_INCLUDED
 #define TP3_H_INCLUDED
-#define MAX_LEN_QTE 15
-#define MAX_LEN_PRIX 15
+#define LEN_MAX_QTE 15
+#define LEN_MAX_PRIX 15
 
 // Structures et types
 struct Produit {
@@ -66,6 +66,7 @@ void clear_screen();
 
     // func
 int getNumLength(int num);
+int getFloatNumLength(float num);
 
 
 

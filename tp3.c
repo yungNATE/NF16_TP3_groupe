@@ -4,9 +4,6 @@
 #include <stdbool.h>
 #include "tp3.h"
 
-#define MAX_LEN_QTE 15
-#define MAX_LEN_PRIX 15
-
 
 /* **********************************
  * Cr�ation et initialisation Produit
@@ -76,8 +73,10 @@ T_Magasin *creerMagasin(char *nom) {
 int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
     // TODO : Attention à bien vérifier toutes les valeurs que peut prendre "magasin"
 
-    if (magasin == NULL) printf("Magasin inexistant.\n");
-
+    if (magasin == NULL) 
+    {
+        printf("Magasin inexistant.\n");
+    }
 
     T_Rayon *rayonPrecedent = NULL;
     T_Rayon *rayonCourant = magasin->liste_rayons;
@@ -115,7 +114,11 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
  * Ajout d'un produit dans un rayon
  ******************************** */
 int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
-    //if(quantite <= 0) return NULL; // TODO : vérifier pourquoi cette ligne lève un warning. Au pire on la vire mais c'est dommage
+    if(quantite <= 0) 
+    {
+        return 0; // TODO : vérifier pourquoi cette ligne lève un warning. Au pire on la vire mais c'est dommage
+        // Peut être car return NULL? Dans le sujet on dit si y a un pb on renvoie 0
+    }
 
     //* Vérification si le produit existe déjà dans le rayon
     T_Produit *produit = rayon->liste_produits;
@@ -123,7 +126,7 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
         if (strcmp(produit->designation, designation) == 0) {
             // Le produit existe déjà, on augmente simplement sa quantite
             produit->quantite_en_stock += quantite;
-            return 0;
+            return 1; // Return 1 car on a ajouté et tout s'est bien passé
         }
         produit = produit->suivant;
     }
@@ -180,8 +183,8 @@ void afficherMagasin(T_Magasin *magasin) {
     else
     {   
         // Pour avoir une table sympa on va calculer la longueur du mot le plus long
-        printf("Affichage des rayons du magasin %s", magasin->nom);
-        int max = 0;
+        printf("Affichage des rayons du magasin %s\n", magasin->nom);
+        int max = strlen("Nom du rayon");
         while (current != NULL)
         {   
             if (strlen(current->nom_rayon) > max)
@@ -261,12 +264,8 @@ void afficherRayon(T_Rayon *rayon) {
     {
         printf("Rayon inexistant.");
     }
-    
 
-    int quantite;
-    int prix;
-
-    if (current != NULL)
+    else if (current == NULL)
     {
         printf("Rayon vide.\n");
     }
@@ -274,15 +273,15 @@ void afficherRayon(T_Rayon *rayon) {
     else
     {   
         // Pour avoir une table sympa on va calculer la longueur du mot le plus long
-        int max = 20;
-        // while (current != NULL)
-        // {   
-        //     if (strlen(current->designation) > max)
-        //     {
-        //         max = strlen(current->designation);
-        //     }
-        //     current = current->suivant;
-        // }
+        int max = strlen("Designation");
+        while (current != NULL)
+        {   
+            if (strlen(current->designation) > max)
+            {
+                max = strlen(current->designation);
+            }
+            current = current->suivant;
+        }
         printf("+");
         for (int k = 0; k < max*1.5; k++)
         {
@@ -334,30 +333,46 @@ void afficherRayon(T_Rayon *rayon) {
         printf(("+\n"));
 
 
-    //     current = rayon->liste_produits; // Car current a été itéré
+        current = rayon->liste_produits; // Car current a été itéré
 
-    //     while (current != NULL)
-    //     {   
-    //         produit = current->liste_produits;
-    //         nb_produits = 0;
-    //         // while (produit->suivant != NULL)
-    //         // {
-    //         //     nb_produits++;
-    //         // }
-    //         printf("| %s", current->nom_rayon);
-    //         for (int k = 0; k < 1.5*max - strlen(current->nom_rayon) - 1; k++)
-    //         {
-    //             printf(" ");
-    //         }
-    //         printf("| ");
-    //         printf("%d", nb_produits);
-    //         for (int k = 0; k < strlen(" Nombre de produits") - getNumLength(nb_produits) - 1; k++)
-    //         {
-    //             printf(" ");
-    //         }
-    //         printf("|\n");
-    //         current = current->suivant;
-    //     }
+        while (current != NULL)
+        {   
+            printf("| %s", current->designation);
+            for (int k = 0; k < 1.5*max - strlen(current->designation) - 1; k++)
+            {
+                printf(" ");
+            }
+            printf("| ");
+            printf("%.2f", current->prix);
+            for (int k = 0; k < LEN_MAX_PRIX*1.5 - getFloatNumLength(current->prix) - 1 - 3; k++)
+            {
+                printf(" ");
+            }
+            printf("| ");
+            printf("%d", current->quantite_en_stock);
+            for (int k = 0; k < LEN_MAX_QTE*1.5 - getNumLength(current->quantite_en_stock) - 1; k++)
+            {
+                printf(" ");
+            }
+            printf("|\n");
+            current = current->suivant;
+        }
+        printf("+");
+        for (int k = 0; k < max*1.5; k++)
+        {
+            printf("-");
+        }
+        printf("+");
+        for (int k = 0; k < LEN_MAX_PRIX*1.5; k++)
+        {
+            printf("-");
+        }
+        printf("+");
+        for (int k = 0; k < LEN_MAX_QTE*1.5; k++)
+        {
+            printf("-");
+        }
+        printf(("+\n"));
     }
 }
 
@@ -435,6 +450,16 @@ int getNumLength(int num) {
     int length = 0;
     while (num != 0) {
         num /= 10;
+        ++length;
+    }
+    return length;
+}
+
+int getFloatNumLength(float num) {
+    int intNum = (int)num;  // convert float to integer
+    int length = 0;
+    while (intNum != 0) {
+        intNum /= 10;
         ++length;
     }
     return length;

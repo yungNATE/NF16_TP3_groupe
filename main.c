@@ -36,16 +36,19 @@ int main(void)
 
                 if(mon_magasin != NULL) { // Si le magasin existe déjà
                     printf("\nUn magasin existe déjà ! ");
-
     
-                    char reponse = 'n'; // intialisation
+                    char reponse = 'n'; // Intialisation
                     do
                     {
-                        if(reponse != 'o' && reponse != 'n') printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse ! ");
+                        if(reponse != 'o' && reponse != 'n') 
+                        {
+                            printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse ! ");
+                        }
 
                         printf("\nVoulez-vous le remplacer ? (o/n) ");
                         reponse = getchar();
                         viderBuffer();
+
                     } while (reponse != 'o' && reponse != 'n');
                     
                     
@@ -57,22 +60,26 @@ int main(void)
                 char nom[50];
                 scanf("%s", nom);
                 viderBuffer();
+
                 mon_magasin = creerMagasin(nom);
                 printf("\nMagasin %s créé ! ", mon_magasin->nom);
                 break;
 
             case '2' : // Ajouter rayon
 
-                // si aucun magasin n'existe
-                if(! isStoreSet(mon_magasin, true)) break;
+                // Si aucun magasin n'existe
+                if(! isStoreSet(mon_magasin, true)) 
+                {
+                    break;
+                }
 
-                // récupération de l'input
+                // Récupération de l'input
                 printf("\nNom du rayon ? ");
                 char nomRayon[50];
                 scanf("%s", nomRayon);
                 viderBuffer();
 
-                // création
+                // Création
                 ajouterRayon(mon_magasin, nomRayon);
                 
 
@@ -81,13 +88,42 @@ int main(void)
             case '3' : // Ajouter produit
 
                 // si aucun magasin n'existe
-                if(! isStoreSet(mon_magasin, true)) break;
-
+                if(! isStoreSet(mon_magasin, true)) 
+                {
+                    break;
+                }
                 // récupération de l'input
+                printf("\nNom du rayon ? ");
+                char nomRayonrecherche[50];
+                scanf("%s", nomRayonrecherche);
+                viderBuffer();
 
+                printf("\nNom du produit ? ");
+                char produitRajouter[50];
+                scanf("%s", produitRajouter);
+                viderBuffer();
+
+                printf("\nPrix du produit ? ");
+                float prix;
+                scanf("%f", &prix);
+                viderBuffer();
+
+                printf("\nQuantité du produit ? ");
+                int quantite;
+                scanf("%d", &quantite);
+                viderBuffer();
 
                 //création
-
+                T_Rayon *rayoncurrent = mon_magasin->liste_rayons;
+                while (rayoncurrent != NULL)
+                {   
+                    if (strcmp(rayoncurrent->nom_rayon, nomRayonrecherche) == 0)
+                    {   
+                        ajouterProduit(rayoncurrent, produitRajouter, prix, quantite);
+                        break;
+                    }
+                    rayoncurrent = rayoncurrent->suivant;
+                }
 
 
                 break;
@@ -95,13 +131,41 @@ int main(void)
             case '4' : // Afficher rayons
 
                 // si aucun magasin n'existe
-                if(! isStoreSet(mon_magasin, true)) break;
-                
+                if(! isStoreSet(mon_magasin, true)) 
+                {   
+                    printf("Le magasin n'existe pas.");
+
+                    break;
+                }
+
                 afficherMagasin(mon_magasin);
 
                 break;
 
             case '5' : // Afficher produits
+
+                if(! isStoreSet(mon_magasin, true))
+                {   
+                    printf("Le magasin n'existe pas.");
+                    break;
+                }
+
+                // Récupération de l'input
+                printf("\nNom du rayon ? ");
+                scanf("%s", nomRayonrecherche);
+                viderBuffer();
+
+                rayoncurrent = mon_magasin->liste_rayons;
+                while (rayoncurrent != NULL)
+                {   
+                    if (strcmp(rayoncurrent->nom_rayon, nomRayonrecherche) == 0)
+                    {   
+                        afficherRayon(rayoncurrent);
+                        break;
+                    }
+                    rayoncurrent = rayoncurrent->suivant;
+                }
+
                 break;
 
             case '6' : // Supprimer produit
@@ -124,13 +188,6 @@ int main(void)
 
         // clear_screen();
     }
-
-    T_Magasin *magasin = creerMagasin("Magasin Test");
-
-    ajouterRayon(magasin, "Rayon Test");
-    
-    afficherRayon(magasin->liste_rayons);
-
 
     return 0;
 }
