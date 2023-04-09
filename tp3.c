@@ -3,6 +3,9 @@
 #include <string.h>
 #include "tp3.h"
 
+#define MAX_LEN_QTE 15
+#define MAX_LEN_PRIX 15
+
 
 /* **********************************
  * Cr�ation et initialisation Produit
@@ -142,6 +145,7 @@ void afficherMagasin(T_Magasin *magasin) {
     else
     {   
         // Pour avoir une table sympa on va calculer la longueur du mot le plus long
+        printf("Affichage des rayons du magasin %s", magasin->nom);
         int max = 0;
         while (current != NULL)
         {   
@@ -215,7 +219,111 @@ void afficherMagasin(T_Magasin *magasin) {
  * Affichage de tous les produits d'un rayon
  ***************************************** */
 void afficherRayon(T_Rayon *rayon) {
-    // TO DO
+    T_Produit *current;
+    current = rayon->liste_produits;
+
+    if (rayon == NULL)
+    {
+        printf("Rayon inexistant.");
+    }
+    
+
+    int quantite;
+    int prix;
+
+    if (current != NULL)
+    {
+        printf("Rayon vide.\n");
+    }
+
+    else
+    {   
+        // Pour avoir une table sympa on va calculer la longueur du mot le plus long
+        int max = 20;
+        // while (current != NULL)
+        // {   
+        //     if (strlen(current->designation) > max)
+        //     {
+        //         max = strlen(current->designation);
+        //     }
+        //     current = current->suivant;
+        // }
+        printf("+");
+        for (int k = 0; k < max*1.5; k++)
+        {
+            printf("-");
+        }
+        printf("+");
+        for (int k = 0; k < LEN_MAX_PRIX*1.5; k++)
+        {
+            printf("-");
+        }
+        printf("+");
+        for (int k = 0; k < LEN_MAX_QTE*1.5; k++)
+        {
+            printf("-");
+        }
+        printf(("+\n"));
+        printf("| Designation ");
+        for (int k = 0; k < max*1.5 - strlen("| Designation ") + 1; k++)
+        {
+            printf(" ");
+        }
+        printf("|");
+        printf(" Prix ");
+        for (int k = 0; k < LEN_MAX_PRIX*1.5 - strlen(" Prix "); k++) // Si temps faire dynamique en fonction du plus grand prix
+        {
+            printf(" ");
+        }
+        printf("| Quantite en stock ");
+        for (int k = 0; k < LEN_MAX_QTE*1.5 - strlen("| Quantite en stock ") + 1; k++) // Si temps faire dynamique en fonction du plus grand qté
+        {
+            printf(" ");
+        }
+        printf("|\n");
+        printf("+");
+        for (int k = 0; k < max*1.5; k++)
+        {
+            printf("-");
+        }
+        printf("+");
+        for (int k = 0; k < LEN_MAX_PRIX*1.5; k++)
+        {
+            printf("-");
+        }
+        printf("+");
+        for (int k = 0; k < LEN_MAX_QTE*1.5; k++)
+        {
+            printf("-");
+        }
+        printf(("+\n"));
+
+
+    //     current = rayon->liste_produits; // Car current a été itéré
+
+    //     while (current != NULL)
+    //     {   
+    //         produit = current->liste_produits;
+    //         nb_produits = 0;
+    //         // while (produit->suivant != NULL)
+    //         // {
+    //         //     nb_produits++;
+    //         // }
+    //         printf("| %s", current->nom_rayon);
+    //         for (int k = 0; k < 1.5*max - strlen(current->nom_rayon) - 1; k++)
+    //         {
+    //             printf(" ");
+    //         }
+    //         printf("| ");
+    //         printf("%d", nb_produits);
+    //         for (int k = 0; k < strlen(" Nombre de produits") - getNumLength(nb_produits) - 1; k++)
+    //         {
+    //             printf(" ");
+    //         }
+    //         printf("|\n");
+    //         current = current->suivant;
+    //     }
+    }
 }
 
 
