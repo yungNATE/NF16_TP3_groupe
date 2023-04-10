@@ -114,10 +114,8 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
  * Ajout d'un produit dans un rayon
  ******************************** */
 int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
-    if(quantite <= 0) 
-    {
-        return 0; // TODO : vérifier pourquoi cette ligne lève un warning. Au pire on la vire mais c'est dommage
-        // Peut être car return NULL? Dans le sujet on dit si y a un pb on renvoie 0
+    if(quantite <= 0) {
+        return 0;
     }
 
     //* Vérification si le produit existe déjà dans le rayon
@@ -510,41 +508,41 @@ int supprimerRayon(T_Magasin *magasin, char *nom_rayon) {
         return 0;
     }
 
-    T_Rayon *rayoncurrent = magasin->liste_rayons;
+    T_Rayon *rayonCourant = magasin->liste_rayons;
     T_Rayon *rayonprecedent = NULL;
     T_Produit *produitcurrent = NULL;
 
     // Si le rayon est au début
-    if (rayoncurrent != NULL && strcasecmp(rayoncurrent->nom_rayon, nom_rayon) == 0)
+    if (rayonCourant != NULL && strcasecmp(rayonCourant->nom_rayon, nom_rayon) == 0)
     {
-        magasin->liste_rayons = rayoncurrent->suivant;
-        produitcurrent = rayoncurrent->liste_produits;
+        magasin->liste_rayons = rayonCourant->suivant;
+        produitcurrent = rayonCourant->liste_produits;
         while (produitcurrent != NULL)
         {
             free(produitcurrent);
             produitcurrent = produitcurrent->suivant;
         }
-        free(rayoncurrent);
+        free(rayonCourant);
         return 1;
     }
 
-    while (rayoncurrent != NULL)
+    while (rayonCourant != NULL)
     {
-        if (strcasecmp(rayoncurrent->nom_rayon, nom_rayon) == 0)
+        if (strcasecmp(rayonCourant->nom_rayon, nom_rayon) == 0)
         {   
-            produitcurrent = rayoncurrent->liste_produits;
+            produitcurrent = rayonCourant->liste_produits;
             while (produitcurrent != NULL)
             {
                 free(produitcurrent);
                 produitcurrent = produitcurrent->suivant;
             }
-            rayonprecedent->suivant = rayoncurrent->suivant;
-            free(rayoncurrent);
+            rayonprecedent->suivant = rayonCourant->suivant;
+            free(rayonCourant);
             return 1;
         }
 
-        rayonprecedent = rayoncurrent;
-        rayoncurrent = rayoncurrent->suivant;
+        rayonprecedent = rayonCourant;
+        rayonCourant = rayonCourant->suivant;
     }
 
     printf("ERREUR: le rayon n'existe pas.");
@@ -571,7 +569,7 @@ void fusionnerRayons(T_Magasin *magasin) {
 
 
 /* ******************************
- * Vérifier si le magasin existe
+ * Vérifie si le magasin existe
  ****************************** */
 bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
     bool isStoreSet = (bool) magasin;
@@ -583,6 +581,24 @@ bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
 
     return true;
 }
+
+
+/* *********************************************************
+ * Vérifie si, au sein du magasin, au moins un rayon existe
+ ******************************************************** */
+bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser) {
+    if(! isStoreSet(magasin, shouldWarnUser)) return false; // Juste au cas où, on vérifie que le magasin soit bien défini.
+                                                            // Si pas de magasin => pas de rayon
+
+    if(magasin->liste_rayons == NULL) {
+        if(shouldWarnUser) printf("\nAucun rayon n'existe ! ");
+        return false;
+    }
+
+    return true;
+}
+
+
 
 /* *********************
  * Fonctions utilitaires

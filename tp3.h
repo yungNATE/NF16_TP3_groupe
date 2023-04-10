@@ -59,6 +59,9 @@ void fusionnerRayons(T_Magasin *magasin);
 // Vérifier si le magasin existe. Peut afficher un msg dans l'invite au besoin.
 bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser);
 
+// Vérifier si, au sein du magasin, au moins un rayon existe. Peut afficher un msg dans l'invite au besoin.
+bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser);
+
 
 // UTILS
     // proc

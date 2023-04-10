@@ -6,3 +6,6 @@
 # VS Code #
 .vscode
 settings.json
+
+# ignored #
+ignored

@@ -35,12 +35,22 @@ int main(void)
 
 
         
-        char *choices = "2345678"; // la liste des choix nécessitant de vérifier si mon_magasin a été initialisé
+        char *choixNecessitantMagDefini = "2345678";    // la liste des choix nécessitant de vérifier si mon_magasin a été initialisé
+        char *choixNecessitantUnRayonDefini = "345678";    // La liste des choix nécessitant de vérifier si au moins un rayon a été initialisé.
+                                                        //  choixNecessitantUnRayonDefini est composé d'une partie des choixNecessitantMagDefini
 
-        if (isCharInArray(choix, choices)){ 
-            // Si aucun magasin n'existe
+        if (isCharInArray(choix, choixNecessitantMagDefini)){ 
+            // Si aucun magasin n'existe pour les choixNecessitantMagDefini
             if(! isStoreSet(mon_magasin, true)) {
                 continue;
+            }
+            
+            // Si un magasin existe pour les choixNecessitantUnRayonDefini...
+            if (isCharInArray(choix, choixNecessitantUnRayonDefini)) {
+                // ... mais qu'aucun rayon n'existe
+                if(! isAnyDeptSet(mon_magasin, true)) {
+                    continue;
+                }
             }
         }
 
@@ -53,8 +63,7 @@ int main(void)
                     char reponse = 'n'; // Intialisation
                     do
                     {
-                        if(reponse != 'o' && reponse != 'n') 
-                        {
+                        if(reponse != 'o' && reponse != 'n') {
                             printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse ! ");
                         }
 
@@ -82,6 +91,7 @@ int main(void)
 
                 // Création
                 ajouterRayon(mon_magasin, nomRayon);
+                printf("\nRayon %s ajouté ! ", nomRayon);
 
                 break;
             }
@@ -104,15 +114,15 @@ int main(void)
                 viderBuffer();
 
                 //création
-                T_Rayon *rayoncurrent = mon_magasin->liste_rayons;
-                while (rayoncurrent != NULL)
+                T_Rayon *rayonCourant = mon_magasin->liste_rayons;
+                while (rayonCourant != NULL)
                 {   
-                    if (strcasecmp(rayoncurrent->nom_rayon, nomRayonRecherche) == 0)
+                    if (strcasecmp(rayonCourant->nom_rayon, nomRayonRecherche) == 0)
                     {   
-                        ajouterProduit(rayoncurrent, nomProduitAAjouter, prix, quantite);
+                        ajouterProduit(rayonCourant, nomProduitAAjouter, prix, quantite);
                         break;
                     }
-                    rayoncurrent = rayoncurrent->suivant;
+                    rayonCourant = rayonCourant->suivant;
                 }
 
                 break;
@@ -123,21 +133,34 @@ int main(void)
 
                 break;
             }
-            case '5' : // Afficher produits
+            case '5' : // Afficher produits d'un rayon
             {
+                // Rappel des noms des rayons
+                T_Rayon *rayonCourant = mon_magasin->liste_rayons;
+                char *charDeSeparation = " | ";
+                printf("\nRayons existants : ");
+                while (rayonCourant != NULL) {
+                    if (rayonCourant->suivant == NULL) charDeSeparation = "";
+                    
+                    printf("%s%s ", rayonCourant->nom_rayon, charDeSeparation);
+                    rayonCourant = rayonCourant->suivant;
+                }
+
                 // Récupération de l'input
                 char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
 
-                T_Rayon *rayoncurrent = mon_magasin->liste_rayons;
-                while (rayoncurrent != NULL)
-                {   
-                    if (strcasecmp(rayoncurrent->nom_rayon, nomRayonRecherche) == 0)
-                    {   
-                        afficherRayon(rayoncurrent);
+                // On parcourt les rayons pour voir si nomRayonRecherche s'y trouve...
+                rayonCourant = mon_magasin->liste_rayons;
+                while (rayonCourant != NULL) {
+                    if (strcasecmp(rayonCourant->nom_rayon, nomRayonRecherche) == 0) {   
+                        afficherRayon(rayonCourant);
                         break;
                     }
-                    rayoncurrent = rayoncurrent->suivant;
+                    rayonCourant = rayonCourant->suivant;
                 }
+
+                // sinon...
+                printf("\nRayon inexistant ! ");
 
                 break;
             }
@@ -148,17 +171,17 @@ int main(void)
                 char *nomProduitASupprimer = getStringInput("\nNom du produit ? ");
 
                 int flag = 0;
-                T_Rayon *rayoncurrent = mon_magasin->liste_rayons;
+                T_Rayon *rayonCourant = mon_magasin->liste_rayons;
 
-                while (rayoncurrent != NULL)
+                while (rayonCourant != NULL)
                 {
-                    if (strcasecmp(rayoncurrent->nom_rayon, nomRayonDuProduitASupprimer) == 0)
+                    if (strcasecmp(rayonCourant->nom_rayon, nomRayonDuProduitASupprimer) == 0)
                     {
-                        supprimerProduit(rayoncurrent, nomProduitASupprimer);
+                        supprimerProduit(rayonCourant, nomProduitASupprimer);
                         flag = 1;
                         break;
                     }
-                    rayoncurrent = rayoncurrent->suivant;
+                    rayonCourant = rayonCourant->suivant;
                 }   
 
                 if (flag == 0) {
