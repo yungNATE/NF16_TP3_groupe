@@ -64,10 +64,13 @@ bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser);
     // proc
 void viderBuffer();
 void clear_screen();
+void replaceNewLine_WithNullTerminator(char *string);
 
     // func
 int getNumLength(int num);
 int getFloatNumLength(float num);
+char *getStringInput(char *prompt);
+bool isCharInArray(char c, char *array);
 
 
 

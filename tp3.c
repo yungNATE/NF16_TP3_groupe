@@ -577,7 +577,7 @@ bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
     bool isStoreSet = (bool) magasin;
 
     if(! isStoreSet) {
-        printf("\nAucun magasin n'existe ! ");
+        if(shouldWarnUser) printf("\nAucun magasin n'existe ! ");
         return false;
     }
 
@@ -600,6 +600,11 @@ void clear_screen(){
     printf("\e[1;1H\e[2J");
 }
 
+// remplace "\n" par "\0" dans un string
+void replaceNewLine_WithNullTerminator(char *str) {
+    str[strcspn(str, "\n")] = '\0';
+}
+
 // Longueur d'un integer (utile pour générer un beau tableau)
 int getNumLength(int num) {
     int length = 0;
@@ -616,6 +621,7 @@ int getNumLength(int num) {
     return length;
 }
 
+// Longueur d'un float
 int getFloatNumLength(float num) {
     int intNum = (int)num;  // convert float to integer
     int length = 0;
@@ -632,3 +638,24 @@ int getFloatNumLength(float num) {
     return length;
 }
 
+// getStringInput de string custom
+char *getStringInput(char *prompt){
+    char *input = malloc(sizeof(char) * 100);
+    printf("%s", prompt);
+    fgets(input, 100, stdin);
+    replaceNewLine_WithNullTerminator(input);
+    fflush(stdin); // TODO : vérifier si utile
+    return input;
+}
+
+
+bool isCharInArray(char c, char *array) {
+    int i = 0;
+    while (array[i] != '\0') {
+        if (array[i] == c) {
+            return true;
+        }
+        i++;
+    }
+    return false;
+}

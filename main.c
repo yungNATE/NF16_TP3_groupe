@@ -5,11 +5,13 @@
 #include "tp3.h"
 #include "tp3.c"
 
+
 int main(void)
 {
 
     
     T_Magasin *mon_magasin = NULL;
+
 
     // ============= MENU UTILISATEUR ============= */
     char choix = '0';
@@ -31,10 +33,21 @@ int main(void)
 
         printf("\nChoix %c sélectionné \n", choix);
 
+
+        
+        char *choices = "2345678"; // la liste des choix nécessitant de vérifier si mon_magasin a été initialisé
+
+        if (isCharInArray(choix, choices)){ 
+            // Si aucun magasin n'existe
+            if(! isStoreSet(mon_magasin, true)) {
+                continue;
+            }
+        }
+
         switch (choix) {
             case '1' : // Créer magasin
 
-                if(mon_magasin != NULL) { // Si le magasin existe déjà
+                if(isStoreSet(mon_magasin, false)) { // Si le magasin existe déjà
                     printf("\nUn magasin existe déjà ! ");
     
                     char reponse = 'n'; // Intialisation
@@ -56,64 +69,36 @@ int main(void)
                     else if(reponse == 'n') break;
                 }
 
-                printf("\nNom du magasin ? ");
-                char nom[NMAX_STR];
-                fgets(nom, NMAX_STR, stdin);
-                // fgets() retourne à la ligne quand on print, la ligne suivante c'est pour éviter cela
-                nom[strcspn(nom, "\n")] = '\0';
-                fflush(stdin);
+                char *nomMagasin = getStringInput("\nNom du magasin ? ");
 
-                mon_magasin = creerMagasin(nom);
+                mon_magasin = creerMagasin(nomMagasin);
                 printf("\nMagasin %s créé ! ", mon_magasin->nom);
                 break;
 
             case '2' : // Ajouter rayon
-
-                // Si aucun magasin n'existe
-                if(! isStoreSet(mon_magasin, true)) 
-                {
-                    break;
-                }
-
+            {
                 // Récupération de l'input
-                printf("\nNom du rayon ? ");
-                char nomRayon[NMAX_STR];
-                fgets(nomRayon, NMAX_STR, stdin);
-                nomRayon[strcspn(nomRayon, "\n")] = '\0';
-                fflush(stdin);
+                char *nomRayon = getStringInput("\nNom du rayon ? ");
 
                 // Création
                 ajouterRayon(mon_magasin, nomRayon);
-                
 
                 break;
+            }
 
             case '3' : // Ajouter produit
-
-                // si aucun magasin n'existe
-                if(! isStoreSet(mon_magasin, true)) 
-                {
-                    break;
-                }
+            {
                 // récupération de l'input
-                printf("\nNom du rayon ? ");
-                char nomRayonrecherche[NMAX_STR];
-                fgets(nomRayonrecherche, NMAX_STR, stdin);
-                nomRayonrecherche[strcspn(nomRayonrecherche, "\n")] = '\0';
-                fflush(stdin);
+                char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
+                char *nomProduitAAjouter = getStringInput("\nNom du produit ? ");
 
-                printf("\nNom du produit ? ");
-                char produitRajouter[NMAX_STR];
-                fgets(produitRajouter, NMAX_STR, stdin);
-                produitRajouter[strcspn(produitRajouter, "\n")] = '\0';
-                fflush(stdin);
 
-                printf("\nPrix du produit ? ");
+                printf("\nPrix du produit ? "); // TODO : ça vaut le coup de créer des fonctions de généralisation ici ? genre un getIntInput & getFloatInput ?
                 float prix;
                 scanf("%f", &prix);
                 viderBuffer();
 
-                printf("\nQuantité du produit ? ");
+                printf("\nQuantité du produit ? "); // TODO : ^^^^
                 int quantite;
                 scanf("%d", &quantite);
                 viderBuffer();
@@ -122,49 +107,31 @@ int main(void)
                 T_Rayon *rayoncurrent = mon_magasin->liste_rayons;
                 while (rayoncurrent != NULL)
                 {   
-                    if (strcasecmp(rayoncurrent->nom_rayon, nomRayonrecherche) == 0)
+                    if (strcasecmp(rayoncurrent->nom_rayon, nomRayonRecherche) == 0)
                     {   
-                        ajouterProduit(rayoncurrent, produitRajouter, prix, quantite);
+                        ajouterProduit(rayoncurrent, nomProduitAAjouter, prix, quantite);
                         break;
                     }
                     rayoncurrent = rayoncurrent->suivant;
                 }
 
-
                 break;
-
+            }
             case '4' : // Afficher rayons
-
-                // si aucun magasin n'existe
-                if(! isStoreSet(mon_magasin, true)) 
-                {   
-                    printf("Le magasin n'existe pas.");
-
-                    break;
-                }
-
+            {
                 afficherMagasin(mon_magasin);
 
                 break;
-
+            }
             case '5' : // Afficher produits
-
-                if(! isStoreSet(mon_magasin, true))
-                {   
-                    printf("Le magasin n'existe pas.");
-                    break;
-                }
-
+            {
                 // Récupération de l'input
-                printf("\nNom du rayon concerné? ");
-                fgets(nomRayonrecherche, NMAX_STR, stdin);
-                nomRayonrecherche[strcspn(nomRayonrecherche, "\n")] = '\0';
-                fflush(stdin);
+                char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
 
-                rayoncurrent = mon_magasin->liste_rayons;
+                T_Rayon *rayoncurrent = mon_magasin->liste_rayons;
                 while (rayoncurrent != NULL)
                 {   
-                    if (strcasecmp(rayoncurrent->nom_rayon, nomRayonrecherche) == 0)
+                    if (strcasecmp(rayoncurrent->nom_rayon, nomRayonRecherche) == 0)
                     {   
                         afficherRayon(rayoncurrent);
                         break;
@@ -173,64 +140,45 @@ int main(void)
                 }
 
                 break;
-
+            }
             case '6' : // Supprimer produit
-
-                if(! isStoreSet(mon_magasin, true))
-                {   
-                    printf("Le magasin n'existe pas.");
-                    break;
-                }
-
-                
+            {                
                 // Récupération de l'input
-                char rayonproduitsupprimer[NMAX_STR];
-                printf("\nNom du rayon concerné ? ");
-                fgets(rayonproduitsupprimer, NMAX_STR, stdin);
-                rayonproduitsupprimer[strcspn(rayonproduitsupprimer, "\n")] = '\0';
-                fflush(stdin);
-                char nomproduitsupprimer[NMAX_STR];
-                printf("\nNom du produit ? ");
-                fgets(nomproduitsupprimer, NMAX_STR, stdin);
-                nomproduitsupprimer[strcspn(nomproduitsupprimer, "\n")] = '\0';
-                fflush(stdin);
+                char *nomRayonDuProduitASupprimer = getStringInput("\nNom du rayon ? ");
+                char *nomProduitASupprimer = getStringInput("\nNom du produit ? ");
 
                 int flag = 0;
-                rayoncurrent = mon_magasin->liste_rayons;
+                T_Rayon *rayoncurrent = mon_magasin->liste_rayons;
 
                 while (rayoncurrent != NULL)
                 {
-                    if (strcasecmp(rayoncurrent->nom_rayon, rayonproduitsupprimer) == 0)
+                    if (strcasecmp(rayoncurrent->nom_rayon, nomRayonDuProduitASupprimer) == 0)
                     {
-                        supprimerProduit(rayoncurrent, nomproduitsupprimer);
+                        supprimerProduit(rayoncurrent, nomProduitASupprimer);
                         flag = 1;
                         break;
                     }
                     rayoncurrent = rayoncurrent->suivant;
                 }   
 
-                if (flag == 0)
-                {
+                if (flag == 0) {
                     printf("Rayon inexistant");
                 }
 
                 break;
-
+            }
             case '7' : // Supprimer rayon
-
-                char rayonasupprimer[NMAX_STR];
-                printf("\nNom du rayon concerné ? ");
-                fgets(rayonasupprimer, NMAX_STR, stdin);
-                rayonasupprimer[strcspn(rayonasupprimer, "\n")] = '\0';
-                fflush(stdin);
-
-                supprimerRayon(mon_magasin, rayonasupprimer);
+            {
+                char *nomRayonASupprimer = getStringInput("\nNom du rayon ? ");
+                supprimerRayon(mon_magasin, nomRayonASupprimer);
 
                break;
-
+            }
             case '8' : // Rechercher produit par prix
-               break;
+            {
 
+               break;
+            }
             case '9' :
                 printf("\n======== PROGRAMME TERMINE ========\n");
                 break;
