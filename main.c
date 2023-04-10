@@ -156,7 +156,7 @@ int main(void)
                 }
 
                 // Récupération de l'input
-                printf("\nNom du rayon ? ");
+                printf("\nNom du rayon concerné? ");
                 fgets(nomRayonrecherche, NMAX_STR, stdin);
                 nomRayonrecherche[strcspn(nomRayonrecherche, "\n")] = '\0';
                 fflush(stdin);
@@ -175,9 +175,57 @@ int main(void)
                 break;
 
             case '6' : // Supprimer produit
+
+                if(! isStoreSet(mon_magasin, true))
+                {   
+                    printf("Le magasin n'existe pas.");
+                    break;
+                }
+
+                
+                // Récupération de l'input
+                char rayonproduitsupprimer[NMAX_STR];
+                printf("\nNom du rayon concerné ? ");
+                fgets(rayonproduitsupprimer, NMAX_STR, stdin);
+                rayonproduitsupprimer[strcspn(rayonproduitsupprimer, "\n")] = '\0';
+                fflush(stdin);
+                char nomproduitsupprimer[NMAX_STR];
+                printf("\nNom du produit ? ");
+                fgets(nomproduitsupprimer, NMAX_STR, stdin);
+                nomproduitsupprimer[strcspn(nomproduitsupprimer, "\n")] = '\0';
+                fflush(stdin);
+
+                int flag = 0;
+                rayoncurrent = mon_magasin->liste_rayons;
+
+                while (rayoncurrent != NULL)
+                {
+                    if (strcasecmp(rayoncurrent->nom_rayon, rayonproduitsupprimer) == 0)
+                    {
+                        supprimerProduit(rayoncurrent, nomproduitsupprimer);
+                        flag = 1;
+                        break;
+                    }
+                    rayoncurrent = rayoncurrent->suivant;
+                }   
+
+                if (flag == 0)
+                {
+                    printf("Rayon inexistant");
+                }
+
                 break;
 
             case '7' : // Supprimer rayon
+
+                char rayonasupprimer[NMAX_STR];
+                printf("\nNom du rayon concerné ? ");
+                fgets(rayonasupprimer, NMAX_STR, stdin);
+                rayonasupprimer[strcspn(rayonasupprimer, "\n")] = '\0';
+                fflush(stdin);
+
+                supprimerRayon(mon_magasin, rayonasupprimer);
+
                break;
 
             case '8' : // Rechercher produit par prix

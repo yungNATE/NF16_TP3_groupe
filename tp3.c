@@ -497,8 +497,58 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
  * Suppression d'un rayon et de tous les produits qu'il contient
  ************************************************************* */
 int supprimerRayon(T_Magasin *magasin, char *nom_rayon) {
-    // TODO
-    return 1;
+    
+    if (magasin == NULL)
+    {   
+        printf("Magasin inexistant.");
+        return 0;
+    }
+
+    if (magasin->liste_rayons == NULL)
+    {
+        printf("Magasin vide.");
+        return 0;
+    }
+
+    T_Rayon *rayoncurrent = magasin->liste_rayons;
+    T_Rayon *rayonprecedent = NULL;
+    T_Produit *produitcurrent = NULL;
+
+    // Si le rayon est au début
+    if (rayoncurrent != NULL && strcasecmp(rayoncurrent->nom_rayon, nom_rayon) == 0)
+    {
+        magasin->liste_rayons = rayoncurrent->suivant;
+        produitcurrent = rayoncurrent->liste_produits;
+        while (produitcurrent != NULL)
+        {
+            free(produitcurrent);
+            produitcurrent = produitcurrent->suivant;
+        }
+        free(rayoncurrent);
+        return 1;
+    }
+
+    while (rayoncurrent != NULL)
+    {
+        if (strcasecmp(rayoncurrent->nom_rayon, nom_rayon) == 0)
+        {   
+            produitcurrent = rayoncurrent->liste_produits;
+            while (produitcurrent != NULL)
+            {
+                free(produitcurrent);
+                produitcurrent = produitcurrent->suivant;
+            }
+            rayonprecedent->suivant = rayoncurrent->suivant;
+            free(rayoncurrent);
+            return 1;
+        }
+
+        rayonprecedent = rayoncurrent;
+        rayoncurrent = rayoncurrent->suivant;
+    }
+
+    printf("ERREUR: le rayon n'existe pas.");
+    return 0;
 }
 
 
