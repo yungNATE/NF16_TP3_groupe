@@ -2,6 +2,7 @@
 #define TP3_H_INCLUDED
 #define LEN_MAX_QTE 15
 #define LEN_MAX_PRIX 15
+#define NMAX_STR 50
 
 // Structures et types
 struct Produit {

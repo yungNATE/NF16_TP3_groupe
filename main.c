@@ -57,9 +57,11 @@ int main(void)
                 }
 
                 printf("\nNom du magasin ? ");
-                char nom[50];
-                scanf("%s", nom);
-                viderBuffer();
+                char nom[NMAX_STR];
+                fgets(nom, NMAX_STR, stdin);
+                // fgets() retourne à la ligne quand on print, la ligne suivante c'est pour éviter cela
+                nom[strcspn(nom, "\n")] = '\0';
+                fflush(stdin);
 
                 mon_magasin = creerMagasin(nom);
                 printf("\nMagasin %s créé ! ", mon_magasin->nom);
@@ -75,9 +77,10 @@ int main(void)
 
                 // Récupération de l'input
                 printf("\nNom du rayon ? ");
-                char nomRayon[50];
-                scanf("%s", nomRayon);
-                viderBuffer();
+                char nomRayon[NMAX_STR];
+                fgets(nomRayon, NMAX_STR, stdin);
+                nomRayon[strcspn(nomRayon, "\n")] = '\0';
+                fflush(stdin);
 
                 // Création
                 ajouterRayon(mon_magasin, nomRayon);
@@ -94,14 +97,16 @@ int main(void)
                 }
                 // récupération de l'input
                 printf("\nNom du rayon ? ");
-                char nomRayonrecherche[50];
-                scanf("%s", nomRayonrecherche);
-                viderBuffer();
+                char nomRayonrecherche[NMAX_STR];
+                fgets(nomRayonrecherche, NMAX_STR, stdin);
+                nomRayonrecherche[strcspn(nomRayonrecherche, "\n")] = '\0';
+                fflush(stdin);
 
                 printf("\nNom du produit ? ");
-                char produitRajouter[50];
-                scanf("%s", produitRajouter);
-                viderBuffer();
+                char produitRajouter[NMAX_STR];
+                fgets(produitRajouter, NMAX_STR, stdin);
+                produitRajouter[strcspn(produitRajouter, "\n")] = '\0';
+                fflush(stdin);
 
                 printf("\nPrix du produit ? ");
                 float prix;
@@ -117,7 +122,7 @@ int main(void)
                 T_Rayon *rayoncurrent = mon_magasin->liste_rayons;
                 while (rayoncurrent != NULL)
                 {   
-                    if (strcmp(rayoncurrent->nom_rayon, nomRayonrecherche) == 0)
+                    if (strcasecmp(rayoncurrent->nom_rayon, nomRayonrecherche) == 0)
                     {   
                         ajouterProduit(rayoncurrent, produitRajouter, prix, quantite);
                         break;
@@ -152,13 +157,14 @@ int main(void)
 
                 // Récupération de l'input
                 printf("\nNom du rayon ? ");
-                scanf("%s", nomRayonrecherche);
-                viderBuffer();
+                fgets(nomRayonrecherche, NMAX_STR, stdin);
+                nomRayonrecherche[strcspn(nomRayonrecherche, "\n")] = '\0';
+                fflush(stdin);
 
                 rayoncurrent = mon_magasin->liste_rayons;
                 while (rayoncurrent != NULL)
                 {   
-                    if (strcmp(rayoncurrent->nom_rayon, nomRayonrecherche) == 0)
+                    if (strcasecmp(rayoncurrent->nom_rayon, nomRayonrecherche) == 0)
                     {   
                         afficherRayon(rayoncurrent);
                         break;

@@ -124,10 +124,75 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
     T_Produit *produit = rayon->liste_produits;
     while (produit != NULL) {
         if (strcmp(produit->designation, designation) == 0) {
-            // Le produit existe déjà, on augmente simplement sa quantite
-            produit->quantite_en_stock += quantite;
-            return 1; // Return 1 car on a ajouté et tout s'est bien passé
+
+            // Le produit existe déjà, on augmente simplement sa quantite et demande si prix modifie ou pas
+            printf("Un produit avec le même nom existe déjà.\n");
+            printf("Vouz aurez le choix entre augmenter sa quantité et/ou modifier son prix si vous avez rentré un prix différent de l'ancien.\n");
+            printf("Si vous souhaitez le remplacer avec la nouvelle quantité et prix, supprimez-le et créez-en un nouveau.\n");
+
+            char reponse = 'n'; // Intialisation
+            do
+            {
+                if(reponse != 'o' && reponse != 'n') 
+                {
+                    printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse ! ");
+                }
+                printf("\nVoulez-vous simplement augmenter sa quantité ? (o/n) ");
+                reponse = getchar();
+                viderBuffer();
+            } while (reponse != 'o' && reponse != 'n'); 
+
+            if(reponse == 'o') 
+            {
+                produit->quantite_en_stock += quantite;
+                if (prix != produit->prix)
+                {
+                    reponse = 'n'; // Intialisation
+                    do
+                    {
+                        if(reponse != 'o' && reponse != 'n') 
+                        {
+                            printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse !\n ");
+                        }
+                        printf("Souhaitez-vous modifier son prix (o/n) ? Ancien prix: %f\n", produit->prix);
+                        reponse = getchar();
+                        viderBuffer();
+                    } while (reponse != 'o' && reponse != 'n');
+
+                    if (reponse == 'o') // On supprime le produit et insere avec qté augmentée et prix différent pour avoix la liste encore triée
+                    {   
+                        int stockancien = produit->quantite_en_stock;
+                        int testsupprim, testajout;
+                        testsupprim = supprimerProduit(rayon, designation);
+                        testajout = ajouterProduit(rayon, designation, prix, stockancien);
+
+                        if (testsupprim == 1 && testajout == 1) // Si tout est ok
+                        {
+                            return 1;
+                        }
+
+                        else
+                        {
+                            return 0;
+                        }
+                    }
+
+                    else
+                    {
+                        return 1;
+                    }
+                }
+
+                return 1;
+            }
+
+            else if(reponse == 'n')
+            {
+                return 0;
+            }
+            
         }
+
         produit = produit->suivant;
     }
 
@@ -230,10 +295,11 @@ void afficherMagasin(T_Magasin *magasin) {
         {   
             produit = current->liste_produits;
             nb_produits = 0;
-            // while (produit->suivant != NULL)
-            // {
-            //     nb_produits++;
-            // }
+            while (produit != NULL)
+            {
+                nb_produits++;
+                produit = produit->suivant;
+            }
             printf("| %s", current->nom_rayon);
             for (int k = 0; k < 1.5*max - strlen(current->nom_rayon) - 1; k++)
             {
@@ -241,7 +307,7 @@ void afficherMagasin(T_Magasin *magasin) {
             }
             printf("| ");
             printf("%d", nb_produits);
-            for (int k = 0; k < strlen(" Nombre de produits") - getNumLength(nb_produits) - 1; k++)
+            for (int k = 0; k < strlen(" Nombre de produits") - getNumLength(nb_produits); k++)
             {
                 printf(" ");
             }
@@ -310,7 +376,7 @@ void afficherRayon(T_Rayon *rayon) {
             printf(" ");
         }
         printf("| Quantite en stock ");
-        for (int k = 0; k < LEN_MAX_QTE*1.5 - strlen("| Quantite en stock ") + 1; k++) // Si temps faire dynamique en fonction du plus grand qté
+        for (int k = 0; k < LEN_MAX_QTE*1.5 - strlen("| Quantité en stock ") + 2; k++) // Si temps faire dynamique en fonction du plus grand qté
         {
             printf(" ");
         }
@@ -382,8 +448,47 @@ void afficherRayon(T_Rayon *rayon) {
  * Suppression d'un produit dans un rayon
  ************************************** */
 int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
-    // TODO
-    return 1;
+
+    // Si le rayon n'existe pas
+    if (rayon == NULL)
+    {
+        printf("Rayon inexistant.\n");
+        return 0;
+    }
+
+    // Si le rayon est vide
+    if (rayon->liste_produits == NULL)
+    {
+        printf("Rayon vide.\n");
+        return 0;
+    }
+
+    T_Produit *produitprecedent = NULL;
+    T_Produit *produitcurrent = rayon->liste_produits;
+
+    // Si le produit est au début
+    if (produitcurrent != NULL && strcasecmp(produitcurrent->designation, designation_produit) == 0)
+    {
+        rayon->liste_produits = produitcurrent->suivant;
+        free(produitcurrent);
+        return 1;
+    }
+
+    while (produitcurrent != NULL)
+    {
+        if (strcasecmp(produitcurrent->designation, designation_produit) == 0)
+        {
+            produitprecedent->suivant = produitcurrent->suivant;
+            free(produitcurrent);
+            return 1;
+        }
+
+        produitprecedent = produitcurrent;
+        produitcurrent = produitcurrent->suivant;
+    }
+
+    printf("ERREUR: Le produit n'est pas dans ce rayon.\n");
+    return 0;
 }
 
 
@@ -448,6 +553,12 @@ void clear_screen(){
 // Longueur d'un integer (utile pour générer un beau tableau)
 int getNumLength(int num) {
     int length = 0;
+
+    if (num == 0)
+    {
+        return 1;
+    }
+
     while (num != 0) {
         num /= 10;
         ++length;
@@ -458,6 +569,12 @@ int getNumLength(int num) {
 int getFloatNumLength(float num) {
     int intNum = (int)num;  // convert float to integer
     int length = 0;
+
+    if (intNum == 0)
+    {
+        return 1;
+    }
+
     while (intNum != 0) {
         intNum /= 10;
         ++length;
