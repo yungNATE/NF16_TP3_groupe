@@ -72,7 +72,10 @@ void replaceNewLine_WithNullTerminator(char *string);
     // func
 int getNumLength(int num);
 int getFloatNumLength(float num);
+// char *getXInput(char *prompt, enum getInputTypes type, char *args);
 char *getStringInput(char *prompt);
+float getFloatInput(char *prompt);
+int getIntInput(char *prompt);
 bool isCharInArray(char c, char *array);
 
 

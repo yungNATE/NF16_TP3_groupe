@@ -605,9 +605,6 @@ bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser) {
     return true;
 }
 
-/* *********************************************************
- * Vérifie si, au sein du magasin, au moins un rayon existe
- ******************************************************** */
 
 
 /* *********************
@@ -664,6 +661,36 @@ int getFloatNumLength(float num) {
     return length;
 }
 
+
+// TODO : généraliser les fonctions getXInput 
+// * get X input ; permet de s'assurer qu'on input bien un X + prompt l'utilisateur
+
+/*
+enum getInputTypes { STRING, INT, FLOAT };
+char *getXInput(char *prompt, enum getInputTypes type, char *args){
+    //* WIP
+    int scanfReturn;
+    float prix; //.....
+
+    //switch en fonction du type pour paramétrer le do while
+    
+
+
+    do {
+        printf("%s", prompt);
+        scanfReturn = scanf("%f", &prix);
+        viderBuffer();
+
+        if (scanfReturn == 0) {
+            printf("\nERREUR : le prix doit être un nombre ! ");
+        }
+    } 
+    while (scanfReturn == 0);
+
+    return "";
+}
+
+*/
 // getStringInput de string custom
 char *getStringInput(char *prompt){
     char *input = malloc(sizeof(char) * 100);
@@ -672,6 +699,44 @@ char *getStringInput(char *prompt){
     replaceNewLine_WithNullTerminator(input);
     fflush(stdin); // TODO : vérifier si utile
     return input;
+}
+
+// getFloatInput ; permet de s'assurer qu'on input bien un float
+float getFloatInput(char *prompt){
+    int scanfReturn;
+    float prix;
+
+    do {
+        printf("%s", prompt);
+        scanfReturn = scanf("%f", &prix);
+        viderBuffer();
+
+        if (scanfReturn == 0) {
+            printf("\nERREUR : le prix doit être un nombre ! ");
+        }
+    } 
+    while (scanfReturn == 0);
+
+    return prix;
+}
+
+// getIntInput ; permet de s'assurer qu'on input bien un int
+int getIntInput(char *prompt){
+    int scanfReturn;
+    int prix;
+
+    do {
+        printf("%s", prompt);
+        scanfReturn = scanf("%d", &prix);
+        viderBuffer();
+
+        if (scanfReturn == 0) {
+            printf("\nERREUR : le prix doit être un nombre ! ");
+        }
+    } 
+    while (scanfReturn == 0);
+
+    return prix;
 }
 
 

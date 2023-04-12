@@ -102,17 +102,9 @@ int main(void)
                 // récupération de l'input
                 char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
                 char *nomProduitAAjouter = getStringInput("\nNom du produit ? ");
+                float prix = getFloatInput("\nPrix du produit ? ");
+                int quantite = getIntInput("\nQuantité du produit ? ");
 
-
-                printf("\nPrix du produit ? "); // TODO : ça vaut le coup de créer des fonctions de généralisation ici ? genre un getIntInput & getFloatInput ?
-                float prix;
-                scanf("%f", &prix);
-                viderBuffer();
-
-                printf("\nQuantité du produit ? "); // TODO : ^^^^
-                int quantite;
-                scanf("%d", &quantite);
-                viderBuffer();
 
                 //création
                 T_Rayon *rayonCourant = mon_magasin->liste_rayons;
@@ -138,7 +130,9 @@ int main(void)
             {
                 // Rappel des noms des rayons
                 T_Rayon *rayonCourant = mon_magasin->liste_rayons;
-                char *charDeSeparation = " | "; // TODO : créer une fonction pour ça cf TODO afficherMagasin() 
+
+                // TODO : créer une fonction pour ça cf TODO afficherMagasin() 
+                char *charDeSeparation = " | "; 
                 printf("\nRayons existants : ");
                 while (rayonCourant != NULL) {
                     if (rayonCourant->suivant == NULL) charDeSeparation = "";
@@ -146,22 +140,25 @@ int main(void)
                     printf("%s%s ", rayonCourant->nom_rayon, charDeSeparation);
                     rayonCourant = rayonCourant->suivant;
                 }
+                // Fin du TODO
 
                 // Récupération de l'input
                 char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
+                bool rayonExiste = false;
 
                 // On parcourt les rayons pour voir si nomRayonRecherche s'y trouve...
                 rayonCourant = mon_magasin->liste_rayons;
                 while (rayonCourant != NULL) {
                     if (strcasecmp(rayonCourant->nom_rayon, nomRayonRecherche) == 0) {   
-                        afficherRayon(rayonCourant);
+                        rayonExiste = true;
                         break;
                     }
                     rayonCourant = rayonCourant->suivant;
                 }
 
-                // sinon...
-                printf("\nRayon inexistant ! ");
+                rayonExiste ?
+                    afficherRayon(rayonCourant) :
+                    printf("\nRayon inexistant ! ");
 
                 break;
             }
@@ -200,6 +197,8 @@ int main(void)
             }
             case '8' : // Rechercher produit par prix
             {
+                // Récupération de l'input
+
 
                break;
             }
