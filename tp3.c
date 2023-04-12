@@ -225,11 +225,15 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
 /* *****************************************
  * Affichage de tous les rayons d'un magasin
  ***************************************** */
-void afficherMagasin(T_Magasin *magasin) {
+void afficherMagasin(T_Magasin *magasin) { 
+    // TODO : ajouter un paramètre booleen isSimplified pour supprimer la colonne quantité en stock 
+    //          (permet de faire de l'affichage des rayons seuls), notamment pour les choix
+    
+    
     T_Rayon *current;
     current = magasin->liste_rayons;
 
-    if (magasin == NULL)
+    if (magasin == NULL) // TODO : utiliser isStoreSet() ?
     {
         printf("Magasin inexistant.");
     }
@@ -565,7 +569,10 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
  ********************* */
 void fusionnerRayons(T_Magasin *magasin) {
     // TODO
+    // merge dept
+    
 }
+    
 
 
 /* ******************************
@@ -598,6 +605,9 @@ bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser) {
     return true;
 }
 
+/* *********************************************************
+ * Vérifie si, au sein du magasin, au moins un rayon existe
+ ******************************************************** */
 
 
 /* *********************

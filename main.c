@@ -35,10 +35,11 @@ int main(void)
 
 
         
-        char *choixNecessitantMagDefini = "2345678";    // la liste des choix nécessitant de vérifier si mon_magasin a été initialisé
-        char *choixNecessitantUnRayonDefini = "345678";    // La liste des choix nécessitant de vérifier si au moins un rayon a été initialisé.
-                                                        //  choixNecessitantUnRayonDefini est composé d'une partie des choixNecessitantMagDefini
+        char *choixNecessitantMagDefini     = "2345678";    // la liste des choix nécessitant de vérifier si mon_magasin a été initialisé
+        char *choixNecessitantUnRayonDefini = "345678";     // La liste des choix nécessitant de vérifier si au moins un rayon a été initialisé.
+                                                            //  choixNecessitantUnRayonDefini est composé d'une partie des choixNecessitantMagDefini
 
+        // Pour éviter la redondance de isStoreSet & isAnyDeptSet dans le switch
         if (isCharInArray(choix, choixNecessitantMagDefini)){ 
             // Si aucun magasin n'existe pour les choixNecessitantMagDefini
             if(! isStoreSet(mon_magasin, true)) {
@@ -137,7 +138,7 @@ int main(void)
             {
                 // Rappel des noms des rayons
                 T_Rayon *rayonCourant = mon_magasin->liste_rayons;
-                char *charDeSeparation = " | ";
+                char *charDeSeparation = " | "; // TODO : créer une fonction pour ça cf TODO afficherMagasin() 
                 printf("\nRayons existants : ");
                 while (rayonCourant != NULL) {
                     if (rayonCourant->suivant == NULL) charDeSeparation = "";
