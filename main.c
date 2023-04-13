@@ -39,6 +39,7 @@ int main(void)
         char *choixNecessitantUnRayonDefini = "345678";     // La liste des choix nécessitant de vérifier si au moins un rayon a été initialisé.
                                                             //  choixNecessitantUnRayonDefini est composé d'une partie des choixNecessitantMagDefini
 
+        // TODO : dans l'idéal, il faudrait virer cette partie pour intégrer les tests directement dans les fonctions
         // Pour éviter la redondance de isStoreSet & isAnyDeptSet dans le switch
         if (isCharInArray(choix, choixNecessitantMagDefini)){ 
             // Si aucun magasin n'existe pour les choixNecessitantMagDefini
@@ -142,48 +143,22 @@ int main(void)
                 }
                 // Fin du TODO
 
-                // Récupération de l'input
+
                 char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
-                bool rayonExiste = false;
+                T_Rayon *rayonRecherche = getDeptByName(mon_magasin, nomRayonRecherche, true);
 
-                // On parcourt les rayons pour voir si nomRayonRecherche s'y trouve...
-                rayonCourant = mon_magasin->liste_rayons;
-                while (rayonCourant != NULL) {
-                    if (strcasecmp(rayonCourant->nom_rayon, nomRayonRecherche) == 0) {   
-                        rayonExiste = true;
-                        break;
-                    }
-                    rayonCourant = rayonCourant->suivant;
-                }
-
-                rayonExiste ?
-                    afficherRayon(rayonCourant) :
-                    printf("\nRayon inexistant ! ");
+                if(rayonRecherche != NULL) afficherRayon(rayonRecherche);
 
                 break;
             }
             case '6' : // Supprimer produit
             {                
-                // Récupération de l'input
                 char *nomRayonDuProduitASupprimer = getStringInput("\nNom du rayon ? ");
                 char *nomProduitASupprimer = getStringInput("\nNom du produit ? ");
 
-                int flag = 0;
-                T_Rayon *rayonCourant = mon_magasin->liste_rayons;
-
-                while (rayonCourant != NULL)
-                {
-                    if (strcasecmp(rayonCourant->nom_rayon, nomRayonDuProduitASupprimer) == 0)
-                    {
-                        supprimerProduit(rayonCourant, nomProduitASupprimer);
-                        flag = 1;
-                        break;
-                    }
-                    rayonCourant = rayonCourant->suivant;
-                }   
-
-                if (flag == 0) {
-                    printf("Rayon inexistant");
+                if (isDeptSet(mon_magasin, nomRayonDuProduitASupprimer, true)){
+                    T_Rayon *rayons = mon_magasin->liste_rayons;
+                    supprimerProduit(rayons, nomProduitASupprimer);
                 }
 
                 break;
@@ -191,7 +166,10 @@ int main(void)
             case '7' : // Supprimer rayon
             {
                 char *nomRayonASupprimer = getStringInput("\nNom du rayon ? ");
-                supprimerRayon(mon_magasin, nomRayonASupprimer);
+
+                if (isDeptSet(mon_magasin, nomRayonASupprimer, true)){
+                    supprimerRayon(mon_magasin, nomRayonASupprimer);
+                }
 
                break;
             }
@@ -207,7 +185,7 @@ int main(void)
                 break;
 
             default :
-                printf("\n\nERREUR : votre choix n'est valide ! ");
+                printf("\n\nERREUR : votre choix n'est pas valide ! ");
         }
         printf("\n\n\n");
 

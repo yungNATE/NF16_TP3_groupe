@@ -5,6 +5,151 @@
 #include "tp3.h"
 
 
+/* *********************
+ * Fonctions utilitaires
+ ********************* */
+// Vider le buffer (utile quand on utlise des getchar() )
+void viderBuffer() {
+    int c = 0;
+    while (c != '\n' && c != EOF) {
+        c = getchar();
+    }
+}
+
+// Fonction pour vider l'écran (normalement imlémentée via de base clrscr(), mais ne fonctionne pas)
+void clear_screen(){
+    printf("\e[1;1H\e[2J");
+}
+
+// remplace "\n" par "\0" dans un string
+void replaceNewLine_WithNullTerminator(char *str) {
+    str[strcspn(str, "\n")] = '\0';
+}
+
+// Longueur d'un integer (utile pour générer un beau tableau)
+int getNumLength(int num) {
+    int length = 0;
+
+    if (num == 0)
+    {
+        return 1;
+    }
+
+    while (num != 0) {
+        num /= 10;
+        ++length;
+    }
+    return length;
+}
+
+// Longueur d'un float
+int getFloatNumLength(float num) {
+    int intNum = (int)num;  // convert float to integer
+    int length = 0;
+
+    if (intNum == 0)
+    {
+        return 1;
+    }
+
+    while (intNum != 0) {
+        intNum /= 10;
+        ++length;
+    }
+    return length;
+}
+
+
+// TODO : généraliser les fonctions getXInput 
+// * get X input ; permet de s'assurer qu'on input bien un X + prompt l'utilisateur
+
+/*
+enum getInputTypes { STRING, INT, FLOAT };
+char *getXInput(char *prompt, enum getInputTypes type, char *args){
+    //* WIP
+    int scanfReturn;
+    float prix; //.....
+
+    //switch en fonction du type pour paramétrer le do while
+    
+
+
+    do {
+        printf("%s", prompt);
+        scanfReturn = scanf("%f", &prix);
+        viderBuffer();
+
+        if (scanfReturn == 0) {
+            printf("\nERREUR : le prix doit être un nombre ! ");
+        }
+    } 
+    while (scanfReturn == 0);
+
+    return "";
+}
+
+*/
+// getStringInput de string custom
+char *getStringInput(char *prompt){
+    char *input = malloc(sizeof(char) * 100);
+    printf("%s", prompt);
+    fgets(input, 100, stdin);
+    replaceNewLine_WithNullTerminator(input);
+    fflush(stdin); // TODO : vérifier si utile
+    return input;
+}
+
+// getFloatInput ; permet de s'assurer qu'on input bien un float
+float getFloatInput(char *prompt){
+    int scanfReturn;
+    float prix;
+
+    do {
+        printf("%s", prompt);
+        scanfReturn = scanf("%f", &prix);
+        viderBuffer();
+
+        if (scanfReturn == 0) {
+            printf("\nERREUR : le prix doit être un nombre ! ");
+        }
+    } 
+    while (scanfReturn == 0);
+
+    return prix;
+}
+
+// getIntInput ; permet de s'assurer qu'on input bien un int
+int getIntInput(char *prompt){
+    int scanfReturn;
+    int prix;
+
+    do {
+        printf("%s", prompt);
+        scanfReturn = scanf("%d", &prix);
+        viderBuffer();
+
+        if (scanfReturn == 0) {
+            printf("\nERREUR : le prix doit être un nombre ! ");
+        }
+    } 
+    while (scanfReturn == 0);
+
+    return prix;
+}
+
+
+bool isCharInArray(char c, char *array) {
+    int i = 0;
+    while (array[i] != '\0') {
+        if (array[i] == c) {
+            return true;
+        }
+        i++;
+    }
+    return false;
+}
+
+
 /* **********************************
  * Cr�ation et initialisation Produit
  ********************************** */
@@ -229,14 +374,10 @@ void afficherMagasin(T_Magasin *magasin) {
     // TODO : ajouter un paramètre booleen isSimplified pour supprimer la colonne quantité en stock 
     //          (permet de faire de l'affichage des rayons seuls), notamment pour les choix
     
+    if(isStoreSet(magasin, true)) return;
     
     T_Rayon *current;
     current = magasin->liste_rayons;
-
-    if (magasin == NULL) // TODO : utiliser isStoreSet() ?
-    {
-        printf("Magasin inexistant.");
-    }
     
 
     int nb_produits;
@@ -444,26 +585,77 @@ void afficherRayon(T_Rayon *rayon) {
     }
 }
 
+/* ******************************
+ * Vérifie si le magasin existe
+ ****************************** */
+bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
+    bool isStoreSet = (bool) magasin;
 
+    if(! isStoreSet) {
+        if(shouldWarnUser) printf("\nAucun magasin n'existe ! ");
+        return false;
+    }
+
+    return true;
+}
+
+
+/* *********************************************************
+ * Vérifie si, au sein du magasin, au moins un rayon existe
+ ******************************************************** */
+bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser) {
+    if(! isStoreSet(magasin, shouldWarnUser)) return false; // Juste au cas où, on vérifie que le magasin soit bien défini.
+                                                            // Si pas de magasin => pas de rayon
+
+    if(magasin->liste_rayons == NULL) {
+        if(shouldWarnUser) printf("\nAucun rayon n'existe ! ");
+        return false;
+    }
+
+    return true;
+}
+
+
+/* ***************************************************************
+ * Alerte pour les fonctions de récupération de rayon
+ ************************************************************** */
+void alert_DeptDoesNotExists(T_Rayon *rayon) {
+    printf("\nLe rayon %s n'existe pas ! ", rayon->nom_rayon);
+}
+
+/* ***************************************************************
+ * Récupère le T_Rayon correspondant au nom passé en paramètre
+ ************************************************************** */
+T_Rayon *getDeptByName(T_Magasin *magasin, char *nom_rayon, bool shouldWarnUser) {
+    T_Rayon *rayonCourant = magasin->liste_rayons;
+
+    while(rayonCourant != NULL) {
+        if(strcasecmp(rayonCourant->nom_rayon, nom_rayon) == 0) return rayonCourant;
+        rayonCourant = rayonCourant->suivant;
+    }
+
+    if(shouldWarnUser) alert_DeptDoesNotExists(rayonCourant);
+    return NULL;
+}
+
+
+/* ***************************************************************
+ * Vérifie si, au sein du magasin, le rayon passé en param existe
+ ************************************************************** */
+bool isDeptSet(T_Magasin *magasin, char *nom_rayon, bool shouldWarnUser) {
+    if(! isAnyDeptSet(magasin, shouldWarnUser)) return false;   // Juste au cas où, on vérifie qu'au moins un rayon soit bien défini.
+
+    T_Rayon *rayon = getDeptByName(magasin, nom_rayon, false);
+    if(rayon != NULL) return true;
+
+    if(shouldWarnUser) alert_DeptDoesNotExists(rayon);
+    return false;
+}
 
 /* **************************************
  * Suppression d'un produit dans un rayon
  ************************************** */
 int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
-
-    // Si le rayon n'existe pas
-    if (rayon == NULL)
-    {
-        printf("Rayon inexistant.\n");
-        return 0;
-    }
-
-    // Si le rayon est vide
-    if (rayon->liste_produits == NULL)
-    {
-        printf("Rayon vide.\n");
-        return 0;
-    }
 
     T_Produit *produitprecedent = NULL;
     T_Produit *produitcurrent = rayon->liste_produits;
@@ -499,18 +691,6 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
  * Suppression d'un rayon et de tous les produits qu'il contient
  ************************************************************* */
 int supprimerRayon(T_Magasin *magasin, char *nom_rayon) {
-    
-    if (magasin == NULL)
-    {   
-        printf("Magasin inexistant.");
-        return 0;
-    }
-
-    if (magasin->liste_rayons == NULL)
-    {
-        printf("Magasin vide.");
-        return 0;
-    }
 
     T_Rayon *rayonCourant = magasin->liste_rayons;
     T_Rayon *rayonprecedent = NULL;
@@ -571,182 +751,4 @@ void fusionnerRayons(T_Magasin *magasin) {
     // TODO
     // merge dept
     
-}
-    
-
-
-/* ******************************
- * Vérifie si le magasin existe
- ****************************** */
-bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
-    bool isStoreSet = (bool) magasin;
-
-    if(! isStoreSet) {
-        if(shouldWarnUser) printf("\nAucun magasin n'existe ! ");
-        return false;
-    }
-
-    return true;
-}
-
-
-/* *********************************************************
- * Vérifie si, au sein du magasin, au moins un rayon existe
- ******************************************************** */
-bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser) {
-    if(! isStoreSet(magasin, shouldWarnUser)) return false; // Juste au cas où, on vérifie que le magasin soit bien défini.
-                                                            // Si pas de magasin => pas de rayon
-
-    if(magasin->liste_rayons == NULL) {
-        if(shouldWarnUser) printf("\nAucun rayon n'existe ! ");
-        return false;
-    }
-
-    return true;
-}
-
-
-
-/* *********************
- * Fonctions utilitaires
- ********************* */
-// Vider le buffer (utile quand on utlise des getchar() )
-void viderBuffer() {
-    int c = 0;
-    while (c != '\n' && c != EOF) {
-        c = getchar();
-    }
-}
-
-// Fonction pour vider l'écran (normalement imlémentée via de base clrscr(), mais ne fonctionne pas)
-void clear_screen(){
-    printf("\e[1;1H\e[2J");
-}
-
-// remplace "\n" par "\0" dans un string
-void replaceNewLine_WithNullTerminator(char *str) {
-    str[strcspn(str, "\n")] = '\0';
-}
-
-// Longueur d'un integer (utile pour générer un beau tableau)
-int getNumLength(int num) {
-    int length = 0;
-
-    if (num == 0)
-    {
-        return 1;
-    }
-
-    while (num != 0) {
-        num /= 10;
-        ++length;
-    }
-    return length;
-}
-
-// Longueur d'un float
-int getFloatNumLength(float num) {
-    int intNum = (int)num;  // convert float to integer
-    int length = 0;
-
-    if (intNum == 0)
-    {
-        return 1;
-    }
-
-    while (intNum != 0) {
-        intNum /= 10;
-        ++length;
-    }
-    return length;
-}
-
-
-// TODO : généraliser les fonctions getXInput 
-// * get X input ; permet de s'assurer qu'on input bien un X + prompt l'utilisateur
-
-/*
-enum getInputTypes { STRING, INT, FLOAT };
-char *getXInput(char *prompt, enum getInputTypes type, char *args){
-    //* WIP
-    int scanfReturn;
-    float prix; //.....
-
-    //switch en fonction du type pour paramétrer le do while
-    
-
-
-    do {
-        printf("%s", prompt);
-        scanfReturn = scanf("%f", &prix);
-        viderBuffer();
-
-        if (scanfReturn == 0) {
-            printf("\nERREUR : le prix doit être un nombre ! ");
-        }
-    } 
-    while (scanfReturn == 0);
-
-    return "";
-}
-
-*/
-// getStringInput de string custom
-char *getStringInput(char *prompt){
-    char *input = malloc(sizeof(char) * 100);
-    printf("%s", prompt);
-    fgets(input, 100, stdin);
-    replaceNewLine_WithNullTerminator(input);
-    fflush(stdin); // TODO : vérifier si utile
-    return input;
-}
-
-// getFloatInput ; permet de s'assurer qu'on input bien un float
-float getFloatInput(char *prompt){
-    int scanfReturn;
-    float prix;
-
-    do {
-        printf("%s", prompt);
-        scanfReturn = scanf("%f", &prix);
-        viderBuffer();
-
-        if (scanfReturn == 0) {
-            printf("\nERREUR : le prix doit être un nombre ! ");
-        }
-    } 
-    while (scanfReturn == 0);
-
-    return prix;
-}
-
-// getIntInput ; permet de s'assurer qu'on input bien un int
-int getIntInput(char *prompt){
-    int scanfReturn;
-    int prix;
-
-    do {
-        printf("%s", prompt);
-        scanfReturn = scanf("%d", &prix);
-        viderBuffer();
-
-        if (scanfReturn == 0) {
-            printf("\nERREUR : le prix doit être un nombre ! ");
-        }
-    } 
-    while (scanfReturn == 0);
-
-    return prix;
-}
-
-
-bool isCharInArray(char c, char *array) {
-    int i = 0;
-    while (array[i] != '\0') {
-        if (array[i] == c) {
-            return true;
-        }
-        i++;
-    }
-    return false;
 }
