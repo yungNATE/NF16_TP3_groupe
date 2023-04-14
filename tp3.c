@@ -368,95 +368,110 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
 
 
 /* *****************************************
+ * Récupération du nom de rayon le plus long
+ ***************************************** */
+char *getLongestDeptName(T_Magasin *magasin) {
+    T_Rayon *rayons;
+    rayons = magasin->liste_rayons;
+
+    char *longestDeptName = NULL;
+    int max = 0, currentRayonLength = 0;
+    while (rayons != NULL)
+    {   
+        currentRayonLength = strlen(rayons->nom_rayon);
+        if (currentRayonLength <= max) continue;
+
+        max = currentRayonLength;
+        longestDeptName = rayons->nom_rayon;
+        rayons = rayons->suivant;
+    }
+
+    // char *longestDeptName = malloc(max + 1);
+    return longestDeptName;
+}
+
+/* *****************************************
  * Affichage de tous les rayons d'un magasin
  ***************************************** */
 void afficherMagasin(T_Magasin *magasin) { 
     // TODO : ajouter un paramètre booleen isSimplified pour supprimer la colonne quantité en stock 
-    //          (permet de faire de l'affichage des rayons seuls), notamment pour les choix
-    
-    if(isStoreSet(magasin, true)) return;
-    
-    T_Rayon *current;
-    current = magasin->liste_rayons;
-    
+    //          (permet de faire de l'affichage des rayons seuls), notamment pour le switch du main
+      
+    if(! isAnyDeptSet(magasin, true)) return;
 
+    T_Rayon *rayons;
+    rayons = magasin->liste_rayons;
+    
     int nb_produits;
     T_Produit *produit;
+  
+    // Pour avoir une table sympa on va calculer la longueur du mot le plus long
+    printf("\nAffichage des rayons du magasin \"%s\"\n", magasin->nom);
 
-    if (current == NULL)
+    char *longestDeptName = getLongestDeptName(magasin);
+    int longestDeptNameLength = strlen(longestDeptName);
+
+    char *minimalLengthString = "Nom du rayon";
+    int minimalLength = strlen(minimalLengthString);
+    
+    int max = longestDeptNameLength > minimalLength ? longestDeptNameLength : minimalLength; // max = le + grand entre longestDeptNameLength et minimalLength
+
+    // wprintf(L"┌");
+    printf("%lc", 0x250C);
+    for (int k = 0; k < max*1.5; k++)
     {
-        printf("Magasin vide.\n");
+        printf("-");
     }
+    wprintf(L"┬");
+    for (int k = 0; k < strlen(" Nombre de produits") + 1; k++)
+    {
+        printf("-");
+    }
+    wprintf(L"┐\n");
+    printf("| Nom du rayon");
+    for (int k = 0; k < max*1.5 - strlen("| Nom du rayon") + 1; k++)
+    {
+        printf(" ");
+    }
+    printf("|");
+    printf(" Nombre de produits ");
+    printf("|\n");
+    wprintf(L"┝");
+    for (int k = 0; k < max*1.5; k++)
+    {
+        printf("-");
+    }
+    wprintf(L"┿");
+    for (int k = 0; k < strlen(" Nombre de produits") + 1; k++)
+    {
+        printf("-");
+    }
+    wprintf(L"┤\n");
 
-    else
+    rayons = magasin->liste_rayons; // Car rayons a été itéré
+
+    while (rayons != NULL)
     {   
-        // Pour avoir une table sympa on va calculer la longueur du mot le plus long
-        printf("Affichage des rayons du magasin %s\n", magasin->nom);
-        int max = strlen("Nom du rayon");
-        while (current != NULL)
-        {   
-            if (strlen(current->nom_rayon) > max)
-            {
-                max = strlen(current->nom_rayon);
-            }
-            current = current->suivant;
-        }
-        printf("+");
-        for (int k = 0; k < max*1.5; k++)
+        produit = rayons->liste_produits;
+        nb_produits = 0;
+        while (produit != NULL)
         {
-            printf("-");
+            nb_produits++;
+            produit = produit->suivant;
         }
-        printf("+");
-        for (int k = 0; k < strlen(" Nombre de produits") + 1; k++)
-        {
-            printf("-");
-        }
-        printf(("+\n"));
-        printf("| Nom du rayon");
-        for (int k = 0; k < max*1.5 - strlen("| Nom du rayon") + 1; k++)
+        printf("| %s", rayons->nom_rayon);
+        for (int k = 0; k < 1.5*max - strlen(rayons->nom_rayon) - 1; k++)
         {
             printf(" ");
         }
-        printf("|");
-        printf(" Nombre de produits ");
+        printf("| ");
+        printf("%d", nb_produits);
+        for (int k = 0; k < strlen(" Nombre de produits") - getNumLength(nb_produits); k++)
+        {
+            printf(" ");
+        }
         printf("|\n");
-        printf("+");
-        for (int k = 0; k < max*1.5; k++)
-        {
-            printf("-");
-        }
-        printf("+");
-        for (int k = 0; k < strlen(" Nombre de produits") + 1; k++)
-        {
-            printf("-");
-        }
-        printf(("+\n"));
-
-        current = magasin->liste_rayons; // Car current a été itéré
-
-        while (current != NULL)
-        {   
-            produit = current->liste_produits;
-            nb_produits = 0;
-            while (produit != NULL)
-            {
-                nb_produits++;
-                produit = produit->suivant;
-            }
-            printf("| %s", current->nom_rayon);
-            for (int k = 0; k < 1.5*max - strlen(current->nom_rayon) - 1; k++)
-            {
-                printf(" ");
-            }
-            printf("| ");
-            printf("%d", nb_produits);
-            for (int k = 0; k < strlen(" Nombre de produits") - getNumLength(nb_produits); k++)
-            {
-                printf(" ");
-            }
-            printf("|\n");
-            current = current->suivant;
-        }
+        rayons = rayons->suivant;
     }
 }
 
@@ -466,15 +481,15 @@ void afficherMagasin(T_Magasin *magasin) {
  * Affichage de tous les produits d'un rayon
  ***************************************** */
 void afficherRayon(T_Rayon *rayon) {
-    T_Produit *current;
-    current = rayon->liste_produits;
+    T_Produit *produits;
+    produits = rayon->liste_produits;
 
     if (rayon == NULL)
     {
         printf("Rayon inexistant.");
     }
 
-    else if (current == NULL)
+    else if (produits == NULL)
     {
         printf("Rayon vide.\n");
     }
@@ -483,13 +498,13 @@ void afficherRayon(T_Rayon *rayon) {
     {   
         // Pour avoir une table sympa on va calculer la longueur du mot le plus long
         int max = strlen("Designation");
-        while (current != NULL)
+        while (produits != NULL)
         {   
-            if (strlen(current->designation) > max)
+            if (strlen(produits->designation) > max)
             {
-                max = strlen(current->designation);
+                max = strlen(produits->designation);
             }
-            current = current->suivant;
+            produits = produits->suivant;
         }
         printf("+");
         for (int k = 0; k < max*1.5; k++)
@@ -542,29 +557,29 @@ void afficherRayon(T_Rayon *rayon) {
         printf(("+\n"));
 
 
-        current = rayon->liste_produits; // Car current a été itéré
+        produits = rayon->liste_produits; // Car produits a été itéré
 
-        while (current != NULL)
+        while (produits != NULL)
         {   
-            printf("| %s", current->designation);
-            for (int k = 0; k < 1.5*max - strlen(current->designation) - 1; k++)
+            printf("| %s", produits->designation);
+            for (int k = 0; k < 1.5*max - strlen(produits->designation) - 1; k++)
             {
                 printf(" ");
             }
             printf("| ");
-            printf("%.2f", current->prix);
-            for (int k = 0; k < LEN_MAX_PRIX*1.5 - getFloatNumLength(current->prix) - 1 - 3; k++)
+            printf("%.2f", produits->prix);
+            for (int k = 0; k < LEN_MAX_PRIX*1.5 - getFloatNumLength(produits->prix) - 1 - 3; k++)
             {
                 printf(" ");
             }
             printf("| ");
-            printf("%d", current->quantite_en_stock);
-            for (int k = 0; k < LEN_MAX_QTE*1.5 - getNumLength(current->quantite_en_stock) - 1; k++)
+            printf("%d", produits->quantite_en_stock);
+            for (int k = 0; k < LEN_MAX_QTE*1.5 - getNumLength(produits->quantite_en_stock) - 1; k++)
             {
                 printf(" ");
             }
             printf("|\n");
-            current = current->suivant;
+            produits = produits->suivant;
         }
         printf("+");
         for (int k = 0; k < max*1.5; k++)

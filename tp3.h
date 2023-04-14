@@ -63,6 +63,8 @@ bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser);
 bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser);
 
 
+// TODO : vérifier que toutes les fonctions du TP3.c sont bien définies ici
+
 // UTILS
     // proc
 void viderBuffer();

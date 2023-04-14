@@ -29,18 +29,18 @@ int main(void)
         printf("\n======================================");
         printf("\n   Votre choix ? ");
         choix = getchar();
-        viderBuffer(); // supprimer de l'entrï¿½e standard le retour charriot et les ï¿½ventuels caractï¿½res supplï¿½mentaires tapï¿½s par l'utilisateur
+        viderBuffer(); // supprimer de l'entr?e standard le retour charriot et les ?ventuels caract?res suppl?mentaires tap?s par l'utilisateur
 
-        printf("\nChoix %c sÃ©lectionnÃ© \n", choix);
+        printf("\nChoix %c s‚lectionn‚ \n", choix);
 
 
         
-        char *choixNecessitantMagDefini     = "2345678";    // la liste des choix nÃ©cessitant de vÃ©rifier si mon_magasin a Ã©tÃ© initialisÃ©
-        char *choixNecessitantUnRayonDefini = "345678";     // La liste des choix nÃ©cessitant de vÃ©rifier si au moins un rayon a Ã©tÃ© initialisÃ©.
-                                                            //  choixNecessitantUnRayonDefini est composÃ© d'une partie des choixNecessitantMagDefini
+        char *choixNecessitantMagDefini     = "2345678";    // la liste des choix n‚cessitant de v‚rifier si mon_magasin a ‚t‚ initialis‚
+        char *choixNecessitantUnRayonDefini = "345678";     // La liste des choix n‚cessitant de v‚rifier si au moins un rayon a ‚t‚ initialis‚.
+                                                            //  choixNecessitantUnRayonDefini est compos‚ d'une partie des choixNecessitantMagDefini
 
-        // TODO : dans l'idÃ©al, il faudrait virer cette partie pour intÃ©grer les tests directement dans les fonctions
-        // Pour Ã©viter la redondance de isStoreSet & isAnyDeptSet dans le switch
+        // TODO : dans l'id‚al, il faudrait virer cette partie pour int‚grer les tests directement dans les fonctions
+        // Pour ‚viter la redondance de isStoreSet & isAnyDeptSet dans le switch
         if (isCharInArray(choix, choixNecessitantMagDefini)){ 
             // Si aucun magasin n'existe pour les choixNecessitantMagDefini
             if(! isStoreSet(mon_magasin, true)) {
@@ -57,16 +57,16 @@ int main(void)
         }
 
         switch (choix) {
-            case '1' : // CrÃ©er magasin
+            case '1' : // Cr‚er magasin
 
-                if(isStoreSet(mon_magasin, false)) { // Si le magasin existe dÃ©jÃ 
-                    printf("\nUn magasin existe dÃ©jÃ  ! ");
+                if(isStoreSet(mon_magasin, false)) { // Si le magasin existe d‚j…
+                    printf("\nUn magasin existe d‚j… ! ");
     
                     char reponse = 'n'; // Intialisation
                     do
                     {
                         if(reponse != 'o' && reponse != 'n') {
-                            printf("\nERREUR : seulement 'o' et 'n' sont acceptÃ©s en rÃ©ponse ! ");
+                            printf("\nERREUR : seulement 'o' et 'n' sont accept‚s en r‚ponse ! ");
                         }
 
                         printf("\nVoulez-vous le remplacer ? (o/n) ");
@@ -83,31 +83,31 @@ int main(void)
                 char *nomMagasin = getStringInput("\nNom du magasin ? ");
 
                 mon_magasin = creerMagasin(nomMagasin);
-                printf("\nMagasin %s crÃ©Ã© ! ", mon_magasin->nom);
+                printf("\nMagasin %s cr‚‚ ! ", mon_magasin->nom);
                 break;
 
             case '2' : // Ajouter rayon
             {
-                // RÃ©cupÃ©ration de l'input
+                // R‚cup‚ration de l'input
                 char *nomRayon = getStringInput("\nNom du rayon ? ");
 
-                // CrÃ©ation
+                // Cr‚ation
                 ajouterRayon(mon_magasin, nomRayon);
-                printf("\nRayon %s ajoutÃ© ! ", nomRayon);
+                printf("\nRayon %s ajout‚ ! ", nomRayon);
 
                 break;
             }
 
             case '3' : // Ajouter produit
             {
-                // rÃ©cupÃ©ration de l'input
+                // r‚cup‚ration de l'input
                 char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
                 char *nomProduitAAjouter = getStringInput("\nNom du produit ? ");
                 float prix = getFloatInput("\nPrix du produit ? ");
-                int quantite = getIntInput("\nQuantitÃ© du produit ? ");
+                int quantite = getIntInput("\nQuantit‚ du produit ? ");
 
 
-                //crÃ©ation
+                //cr‚ation
                 T_Rayon *rayonCourant = mon_magasin->liste_rayons;
                 while (rayonCourant != NULL)
                 {   
@@ -132,7 +132,7 @@ int main(void)
                 // Rappel des noms des rayons
                 T_Rayon *rayonCourant = mon_magasin->liste_rayons;
 
-                // TODO : crÃ©er une fonction pour Ã§a cf TODO afficherMagasin() 
+                // TODO : cr‚er une fonction pour ‡a cf TODO afficherMagasin() 
                 char *charDeSeparation = " | "; 
                 printf("\nRayons existants : ");
                 while (rayonCourant != NULL) {
@@ -175,7 +175,7 @@ int main(void)
             }
             case '8' : // Rechercher produit par prix
             {
-                // RÃ©cupÃ©ration de l'input
+                // R‚cup‚ration de l'input
 
 
                break;
