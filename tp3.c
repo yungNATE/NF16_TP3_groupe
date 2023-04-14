@@ -393,6 +393,11 @@ char *getLongestDeptName(T_Magasin *magasin) {
 /* *****************************************
  * Affichage de tous les rayons d'un magasin
  ***************************************** */
+
+//* !! WORK IN PROGRESS !! *//
+//* Je suis en train de taffer sur la fonction, c'est pas fini *//
+//* Pas touche !! *//
+
 void afficherMagasin(T_Magasin *magasin) { 
     // TODO : ajouter un paramètre booleen isSimplified pour supprimer la colonne quantité en stock 
     //          (permet de faire de l'affichage des rayons seuls), notamment pour le switch du main
@@ -405,48 +410,69 @@ void afficherMagasin(T_Magasin *magasin) {
     int nb_produits;
     T_Produit *produit;
   
-    // Pour avoir une table sympa on va calculer la longueur du mot le plus long
     printf("\nAffichage des rayons du magasin \"%s\"\n", magasin->nom);
 
+    // Pour avoir une table sympa on va calculer la longueur du mot le plus long
     char *longestDeptName = getLongestDeptName(magasin);
     int longestDeptNameLength = strlen(longestDeptName);
 
-    char *minimalLengthString = "Nom du rayon";
-    int minimalLength = strlen(minimalLengthString);
+    char *colonneUnNom = "Nom du rayon";
+    int colonneUnLength = strlen(colonneUnNom);
     
-    int max = longestDeptNameLength > minimalLength ? longestDeptNameLength : minimalLength; // max = le + grand entre longestDeptNameLength et minimalLength
+    int max = longestDeptNameLength > colonneUnLength ? longestDeptNameLength : colonneUnLength; // max = le + grand entre longestDeptNameLength et colonneUnLength
 
-    // wprintf(L"┌");
-    printf("%lc", 0x250C);
-    for (int k = 0; k < max*1.5; k++)
+    // Affichage de la table
+    char *colonneDeuxNom = "Nombre de produits";
+    int colonneDeuxLength = strlen(colonneDeuxNom);
+    char colonneSeparation = '|';
+    char ligneSeparation = '-';
+
+    char angleHautGauche    = '+'; // je fais tous les angles pour pouvoir facilement les changer en unicode par la suite
+    char angleHautDroite    = '+'; // TODO : peut-etre plutot faire un tableau d'index par la suite ? genre => angle["basGauche"]...
+    char angleMilieuGauche  = '+';
+    char angleMilieuDroite  = '+';
+    char angleBasGauche     = '+';
+    char angleBasDroite     = '+';
+
+    // TODO : Changer les + en caractère unicode (mais c'est chiant donc on verra ça en dernier)
+    printf(&angleHautGauche);
+    int maxElargi = max*1.5;
+    for (int k = 0; k < maxElargi; k++) {
+        printf(&ligneSeparation);
+    }
+    printf(&angleHautDroite);
+
+    for (int k = 0; k < colonneDeuxLength + 1; k++) {
+        printf(&ligneSeparation);
+    }
+    printf("%c", &angleMilieuGauche);
+    printf("\n");
+    printf("%c", &colonneSeparation);
+    printf(" ");
+    printf("%s", &colonneUnNom);
+
+    // int nbEspacesAAjouterApresNomRayon = maxElargi - () strlen("Nom du rayon"); // Pour aérer un peu le tableau et éviter que la prochaine colonne séparation soit collée
+    for (int k = 0; k < maxElargi - strlen("| Nom du rayon") + 1; k++)
+    {
+        printf(".");
+    }
+    printf("| ");
+    printf("Nombre de produits");
+    printf(" |");
+    printf("\n");
+    printf(&angleMilieuDroite);
+
+    for (int k = 0; k < maxElargi; k++)
     {
         printf("-");
     }
-    wprintf(L"┬");
-    for (int k = 0; k < strlen(" Nombre de produits") + 1; k++)
+    printf("+");
+    for (int k = 0; k < colonneDeuxLength + 1; k++)
     {
         printf("-");
     }
-    wprintf(L"┐\n");
-    printf("| Nom du rayon");
-    for (int k = 0; k < max*1.5 - strlen("| Nom du rayon") + 1; k++)
-    {
-        printf(" ");
-    }
-    printf("|");
-    printf(" Nombre de produits ");
-    printf("|\n");
-    wprintf(L"┝");
-    for (int k = 0; k < max*1.5; k++)
-    {
-        printf("-");
-    }
-    wprintf(L"┿");
-    for (int k = 0; k < strlen(" Nombre de produits") + 1; k++)
-    {
-        printf("-");
-    }
-    wprintf(L"┤\n");
+    printf("+");
+    printf("\n");
 
     rayons = magasin->liste_rayons; // Car rayons a été itéré
 
@@ -466,7 +492,7 @@ void afficherMagasin(T_Magasin *magasin) {
         }
         printf("| ");
         printf("%d", nb_produits);
-        for (int k = 0; k < strlen(" Nombre de produits") - getNumLength(nb_produits); k++)
+        for (int k = 0; k < colonneDeuxLength - getNumLength(nb_produits); k++)
         {
             printf(" ");
         }
@@ -475,7 +501,7 @@ void afficherMagasin(T_Magasin *magasin) {
     }
 }
 
-
+//* Pas touche ^^^^^^^^ !! *//
 
 /* *****************************************
  * Affichage de tous les produits d'un rayon
@@ -498,6 +524,7 @@ void afficherRayon(T_Rayon *rayon) {
     {   
         // Pour avoir une table sympa on va calculer la longueur du mot le plus long
         int max = strlen("Designation");
+        int maxElargi = max*1.5;
         while (produits != NULL)
         {   
             if (strlen(produits->designation) > max)
@@ -507,7 +534,7 @@ void afficherRayon(T_Rayon *rayon) {
             produits = produits->suivant;
         }
         printf("+");
-        for (int k = 0; k < max*1.5; k++)
+        for (int k = 0; k < maxElargi; k++)
         {
             printf("-");
         }
@@ -523,7 +550,7 @@ void afficherRayon(T_Rayon *rayon) {
         }
         printf(("+\n"));
         printf("| Designation ");
-        for (int k = 0; k < max*1.5 - strlen("| Designation ") + 1; k++)
+        for (int k = 0; k < maxElargi - strlen("| Designation ") + 1; k++)
         {
             printf(" ");
         }
@@ -540,7 +567,7 @@ void afficherRayon(T_Rayon *rayon) {
         }
         printf("|\n");
         printf("+");
-        for (int k = 0; k < max*1.5; k++)
+        for (int k = 0; k < maxElargi; k++)
         {
             printf("-");
         }
@@ -582,7 +609,7 @@ void afficherRayon(T_Rayon *rayon) {
             produits = produits->suivant;
         }
         printf("+");
-        for (int k = 0; k < max*1.5; k++)
+        for (int k = 0; k < maxElargi; k++)
         {
             printf("-");
         }
