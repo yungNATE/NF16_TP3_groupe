@@ -837,7 +837,7 @@ int supprimerRayon(T_Magasin *magasin, char *nom_rayon) {
 void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
 
     T_Rayon *rayon_current = magasin->liste_rayons;
-    T_Produit *produit_current = NULL;
+    T_Produit *produit_current;
 
     T_Rayon_Temp *rayontemp = NULL; // Tête de la liste à afficher
     rayontemp = malloc(sizeof(T_Rayon_Temp));
@@ -850,6 +850,8 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
     T_Rayon_Temp *rayontemp_current = NULL;
     rayontemp_current = malloc(sizeof(T_Rayon_Temp));
     rayontemp_current->suivant = NULL;
+
+    // ============================PB DANS CE QUI PRECEDE
 
     while (rayon_current != NULL) // Itérer les rayons
     {   
