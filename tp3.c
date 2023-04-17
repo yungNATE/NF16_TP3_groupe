@@ -754,7 +754,6 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
 
     T_Produit *produitprecedent = NULL;
     T_Produit *produitcurrent = rayon->liste_produits;
-    printf("\nTEST:%s", produitcurrent->designation);
     // Si le produit est au début
     if (produitcurrent != NULL && strcasecmp(produitcurrent->designation, designation_produit) == 0)
     {
@@ -767,7 +766,6 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
     {
         if (strcasecmp(produitcurrent->designation, designation_produit) == 0)
         {   
-            printf("\nTROUVEEEEE");
             produitprecedent->suivant = produitcurrent->suivant;
             free(produitcurrent);
             return 1;
@@ -851,8 +849,6 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
     rayontemp_current = malloc(sizeof(T_Rayon_Temp));
     rayontemp_current->suivant = NULL;
 
-    // ============================PB DANS CE QUI PRECEDE
-
     while (rayon_current != NULL) // Itérer les rayons
     {   
         produit_current = rayon_current->liste_produits;
@@ -860,7 +856,6 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
         {   
             if (produit_current->prix >= prix_min && produit_current->prix <= prix_max) // Si c'est le bon produit
             {   
-                printf("PRODUIT %s AJOUTE\n", produit_current->designation);
                 ajouterProduit_RayonTemp(&rayontemp, produit_current->designation, produit_current->prix, produit_current->quantite_en_stock, rayon_current->nom_rayon);
             }
             

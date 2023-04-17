@@ -157,7 +157,7 @@ int main(void)
                 char *nomProduitASupprimer = getStringInput("\nNom du produit ? ");
 
                 if (isDeptSet(mon_magasin, nomRayonDuProduitASupprimer, true)){
-                    T_Rayon *rayons = mon_magasin->liste_rayons;
+                    T_Rayon *rayons = getDeptByName(mon_magasin, nomRayonDuProduitASupprimer, true);
                     supprimerProduit(rayons, nomProduitASupprimer);
                 }
 
