@@ -27,7 +27,7 @@ struct Magasin {
 typedef struct Magasin T_Magasin;
 
 
-// Cr�ation et initialisation des structures
+// Cr?ation et initialisation des structures
 T_Produit *creerProduit(char *designation, float prix, int quantite);
 T_Rayon *creerRayon(char *nom);
 T_Magasin *creerMagasin(char *nom);
@@ -50,20 +50,20 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit);
 // Suppression d'un rayon et de tous les produits qu'il contient
 int supprimerRayon(T_Magasin *magasin, char *nom_rayon);
 
-// Recherche des produits se situant dans une fourchette de prix entr�e par l'utilisateur
+// Recherche des produits se situant dans une fourchette de prix entr?e par l'utilisateur
 void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max);
 
 // Fusionner deux rayons
 void fusionnerRayons(T_Magasin *magasin);
 
-// Vérifier si le magasin existe. Peut afficher un msg dans l'invite au besoin.
+// V?rifier si le magasin existe. Peut afficher un msg dans l'invite au besoin.
 bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser);
 
-// Vérifier si, au sein du magasin, au moins un rayon existe. Peut afficher un msg dans l'invite au besoin.
+// V?rifier si, au sein du magasin, au moins un rayon existe. Peut afficher un msg dans l'invite au besoin.
 bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser);
 
 
-// TODO : vérifier que toutes les fonctions du TP3.c sont bien définies ici
+// TODO : v?rifier que toutes les fonctions du TP3.c sont bien d?finies ici
 
 // UTILS
     // proc
