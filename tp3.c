@@ -897,13 +897,14 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
  * Fusionner deux rayons
  ********************* */
 void fusionnerRayons(T_Magasin *magasin) {
-    
+
     char *nom_rayon_1 = getStringInput("\nNom du rayon 1? ");
     char *nom_rayon_2 = getStringInput("\nNom du rayon 2 ? ");
     char *nom_resultant = getStringInput("\nNom du rayon résultant?");
 
-    if (isDeptSet(magasin, nom_rayon_1, true) && isDeptSet(magasin, nom_rayon_2, true)) // Si les 2 rayons existent
-        {
+    if (isDeptSet(magasin, nom_rayon_1, false) && isDeptSet(magasin, nom_rayon_2, false)) // Si les 2 rayons existent
+    {
+        printf("ISDEPTSET");
         // Identification des rayons à fusionner
         T_Rayon *rayon_1 = getDeptByName(magasin, nom_rayon_1, true);
         T_Rayon *rayon_2 = getDeptByName(magasin, nom_rayon_2, true);
