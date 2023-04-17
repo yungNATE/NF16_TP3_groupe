@@ -26,6 +26,15 @@ struct Magasin {
 };
 typedef struct Magasin T_Magasin;
 
+struct Rayon_Temp {
+    char *designation;
+    float prix;
+    int quantite_en_stock;
+    char *rayon;
+    struct Rayon_Temp *suivant;
+};
+typedef struct Rayon_Temp T_Rayon_Temp;
+
 
 // Cr?ation et initialisation des structures
 T_Produit *creerProduit(char *designation, float prix, int quantite);
@@ -37,6 +46,9 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon);
 
 // Ajout d'un produit dans un rayon
 int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite);
+
+// Ajout d'un produit dans un rayon de la nouvelle structure
+void ajouterProduit_RayonTemp(T_Rayon_Temp **rayon, char *designation, float prix, int quantite, char *nom_rayon);
 
 // Affichage de tous les rayons d'un magasin
 void afficherMagasin(T_Magasin *magasin);

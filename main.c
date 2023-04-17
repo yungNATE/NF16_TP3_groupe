@@ -14,8 +14,8 @@ int main(void)
 
 
     // ============= MENU UTILISATEUR ============= */
-    char choix = '0';
-    while (choix != '9') {
+    char choix = 'x';
+    while (choix != '0') {
         printf("\n======================================");
         printf("\n1. Creer un magasin");
         printf("\n2. Ajouter un rayon au magasin");
@@ -25,7 +25,8 @@ int main(void)
         printf("\n6. Supprimer un produit");
         printf("\n7. Supprimer un rayon");
         printf("\n8. Rechercher un produit par prix");
-        printf("\n9. Quitter");
+        printf("\n9. Fusionner 2 rayons");
+        printf("\n0. Quitter");
         printf("\n======================================");
         printf("\n   Votre choix ? ");
         choix = getchar();
@@ -57,6 +58,10 @@ int main(void)
         }
 
         switch (choix) {
+            case '0' :
+                printf("\n======== PROGRAMME TERMINE ========\n");
+                break;
+
             case '1' : // Cr‚er magasin
 
                 if(isStoreSet(mon_magasin, false)) { // Si le magasin existe d‚j…
@@ -157,7 +162,7 @@ int main(void)
                 char *nomProduitASupprimer = getStringInput("\nNom du produit ? ");
 
                 if (isDeptSet(mon_magasin, nomRayonDuProduitASupprimer, true)){
-                    T_Rayon *rayons = mon_magasin->liste_rayons;
+                    T_Rayon *rayons = getDeptByName(mon_magasin, nomRayonDuProduitASupprimer, true);
                     supprimerProduit(rayons, nomProduitASupprimer);
                 }
 
@@ -175,13 +180,19 @@ int main(void)
             }
             case '8' : // Rechercher produit par prix
             {
-                // R‚cup‚ration de l'input
-
+                float prix_min = getFloatInput("\nPrix minimal du produit ? ");
+                float prix_max = getFloatInput("\nPrix maximal du produit ? ");
+                
+                rechercheProduits(mon_magasin,prix_min, prix_max);
 
                break;
             }
-            case '9' :
-                printf("\n======== PROGRAMME TERMINE ========\n");
+            case '9' : // Fusionner 2 rayons
+
+                if (isStoreSet(mon_magasin, true)){
+                    fusionnerRayons(mon_magasin);
+                }
+
                 break;
 
             default :

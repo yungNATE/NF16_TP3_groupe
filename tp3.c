@@ -351,14 +351,67 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
 
     // On vient de d�passer le dernier produit au prix < au prix courant. On ins�re 
     if(produitPrecedent == NULL)
+    {
+        nouveauProduit->suivant = rayon->liste_produits;
         rayon->liste_produits = nouveauProduit;
-    else
-        produitPrecedent->suivant = nouveauProduit;
+    }
+
+    else produitPrecedent->suivant = nouveauProduit;
 
     nouveauProduit->suivant = produitCourant; // Pour bien marquer la fin
 
     return 1; // Succ�s de l'ajout
 }
+
+
+
+
+/* **********************************************
+ * Ajout produit dans la nouvelle structure rayon
+ ********************************************* */
+void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float prix, int quantite, char *nom_rayon) {
+
+    // Si la liste est vide, càd designation = "-1" on ajoute directement le produit
+    if (strcmp((*rayontemp)->designation, "-1") == 0) {
+    (*rayontemp)->designation = malloc(strlen(designation) + 1);
+    strcpy((*rayontemp)->designation, designation);
+    (*rayontemp)->prix = prix;
+    (*rayontemp)->quantite_en_stock = quantite;
+    (*rayontemp)->rayon = malloc(strlen(nom_rayon) + 1);
+    strcpy((*rayontemp)->rayon, nom_rayon);
+    (*rayontemp)->suivant = NULL;
+    return;
+    }
+
+    // Sinon tant qu'on trouve un prix inférieur au produit courant, on avance dans le rayon 
+    T_Rayon_Temp *current = *rayontemp;
+    T_Rayon_Temp *precedent = NULL;
+    while (current != NULL && current->prix < prix) {
+        precedent = current;
+        current = current->suivant;
+    }
+
+    // On crée un nouveau produit à insérer
+    T_Rayon_Temp *nouveau = malloc(sizeof(T_Rayon_Temp));
+    nouveau->designation = malloc(strlen(designation) + 1);
+    strcpy(nouveau->designation, designation);
+    nouveau->prix = prix;
+    nouveau->quantite_en_stock = quantite;
+    nouveau->rayon = malloc(strlen(nom_rayon) + 1);
+    strcpy(nouveau->rayon, nom_rayon);
+    nouveau->suivant = NULL;
+
+    if (precedent == NULL) { // Si insertion en tête
+        nouveau->suivant = *rayontemp;
+        *rayontemp = nouveau;
+    }
+
+    else {
+        nouveau->suivant = current;
+        precedent->suivant = nouveau;
+    }
+}
+
 
 
 
@@ -717,7 +770,7 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
     while (produitcurrent != NULL)
     {
         if (strcasecmp(produitcurrent->designation, designation_produit) == 0)
-        {
+        {   
             produitprecedent->suivant = produitcurrent->suivant;
             free(produitcurrent);
             return 1;
@@ -785,7 +838,62 @@ int supprimerRayon(T_Magasin *magasin, char *nom_rayon) {
  * Recherche des produits se situant dans une fourchette de prix entr?e par l'utilisateur
  ************************************************************************************** */
 void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
-    // TODO
+
+    T_Rayon *rayon_current = magasin->liste_rayons;
+    T_Produit *produit_current;
+
+    T_Rayon_Temp *rayontemp = NULL; // Tête de la liste à afficher
+    rayontemp = malloc(sizeof(T_Rayon_Temp));
+    rayontemp->designation = malloc(strlen("-1") + 1); // On initialise à -1 pour savoir s'il est vide ou pas
+    strcpy(rayontemp->designation, "-1");
+    rayontemp->suivant = NULL;
+
+
+    // On initialise celui que l'on va itérer, pour conserver le début dans rayontemp
+    T_Rayon_Temp *rayontemp_current = NULL;
+    rayontemp_current = malloc(sizeof(T_Rayon_Temp));
+    rayontemp_current->suivant = NULL;
+
+    while (rayon_current != NULL) // Itérer les rayons
+    {   
+        produit_current = rayon_current->liste_produits;
+        while (produit_current != NULL) // Itérer les produits du rayon
+        {   
+            if (produit_current->prix >= prix_min && produit_current->prix <= prix_max) // Si c'est le bon produit
+            {   
+                ajouterProduit_RayonTemp(&rayontemp, produit_current->designation, produit_current->prix, produit_current->quantite_en_stock, rayon_current->nom_rayon);
+            }
+            
+            produit_current = produit_current->suivant;
+        }
+        rayon_current = rayon_current->suivant;
+    }
+
+    // A cette étape nous avons construit la liste chainée et elle est prête à être print
+
+    rayontemp_current = rayontemp; // On revient dans la tête. On utilise current pour ne pas perdre la tête pour free la mémoire après
+
+    // Afficher comme: Marque | Prix | Quantité en stock | Rayon 
+    // Normalement c'est déjà trié par prix croissant
+
+    while (rayontemp_current != NULL)
+    {
+        printf("%s --- %.2f --- %d --- %s\n", rayontemp_current->designation, rayontemp_current->prix, rayontemp_current->quantite_en_stock, rayontemp_current->rayon);
+        rayontemp_current = rayontemp_current->suivant;
+    }
+    // On libère la mémoire du rayon temporaire créé
+
+    rayontemp_current = rayontemp;
+    while (rayontemp_current != NULL)
+    {   
+        T_Rayon_Temp *tofree;
+        tofree = rayontemp_current;
+        rayontemp_current = rayontemp_current->suivant;
+        free(tofree->designation);
+        free(tofree->rayon);
+        free(tofree);
+    }
+    free(rayontemp_current);
 }
 
 
@@ -794,7 +902,116 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
  * Fusionner deux rayons
  ********************* */
 void fusionnerRayons(T_Magasin *magasin) {
-    // TODO
-    // merge dept
+
+    char *nom_rayon_1 = getStringInput("\nNom du rayon 1? ");
+    char *nom_rayon_2 = getStringInput("\nNom du rayon 2 ? ");
+    char *nom_resultant = getStringInput("\nNom du rayon résultant?");
+
+    if (isDeptSet(magasin, nom_rayon_1, false) && isDeptSet(magasin, nom_rayon_2, false)) // Si les 2 rayons existent
+    {
+        printf("ISDEPTSET");
+        // Identification des rayons à fusionner
+        T_Rayon *rayon_1 = getDeptByName(magasin, nom_rayon_1, true);
+        T_Rayon *rayon_2 = getDeptByName(magasin, nom_rayon_2, true);
+        
+        T_Produit *prayon_1 = rayon_1->liste_produits;
+        T_Produit *prayon_2 = rayon_2->liste_produits;
+
+        // Ca va nous permettre de créer le nouveau rayon avec le même nom de ceux précédents
+        // On remplace leur nom. De toute façon on les supprime après
+
+        strcpy(rayon_1->nom_rayon, "x");
+        strcpy(rayon_2->nom_rayon, "xx");
+
+        // Création et identification du nouveau rayon
+        ajouterRayon(magasin, nom_resultant);
+        T_Rayon *rayon_resultant = getDeptByName(magasin, nom_resultant, true);
+
+        // Regarder si un des rayons est vide
+
+        
+        // Juste pour regrouper les cas particuliers avec if..else
+        if ((prayon_1 == NULL && prayon_2 == NULL) || (prayon_1 != NULL && prayon_2 == NULL) || (prayon_1 == NULL && prayon_2 != NULL))
+        {
+            if (prayon_1 == NULL && prayon_2 == NULL)
+            {
+                // on ne fait rien; à la fin on supprime les 2 rayons et on laisse juste le nouveau
+            }
+
+            else if (prayon_1 != NULL && prayon_2 == NULL)
+            {
+                rayon_resultant->liste_produits = prayon_1;
+            }
+
+            else if (prayon_1 == NULL && prayon_2 != NULL)
+            {
+                rayon_resultant->liste_produits = prayon_2;
+            }
+        }
+
+        else 
+        {
+            // Marquer le début du rayon avec le produit le moins cher
+            if (prayon_1->prix >= prayon_2->prix)
+            {
+                rayon_resultant->liste_produits = prayon_2;
+                prayon_2 = prayon_2->suivant;
+            }
+
+            else
+            {
+                rayon_resultant->liste_produits = prayon_1;
+                prayon_1 = prayon_1->suivant;
+            }
+
+            T_Produit *buffer = rayon_resultant->liste_produits;
+
+            while (prayon_1 != NULL && prayon_2 != NULL)
+            {
+                if (prayon_1->prix >= prayon_2->prix)
+                {   
+                    buffer->suivant = prayon_2;
+                    buffer = prayon_2;
+                    prayon_2 = prayon_2->suivant;
+                }
+
+                else
+                {
+                    buffer->suivant = prayon_1;
+                    buffer = prayon_1;
+                    prayon_1 = prayon_1->suivant;
+                }
+            }
+
+            if (prayon_1 == NULL && prayon_2 != NULL)
+            {
+                buffer->suivant = prayon_2;
+            }
+
+            if (prayon_1 != NULL && prayon_2 == NULL)
+            {
+                buffer->suivant = prayon_1;
+            }
+        }
+        // Dans TOUS LES CAS:
+        // On supprime ces rayons
+        // Ils vont quand même pointer sur le premier produit, on met NULL pour pas supprimer les produits avec
+        rayon_1->liste_produits = NULL;
+        rayon_2->liste_produits = NULL;
+
+        supprimerRayon(magasin, "x");
+        supprimerRayon(magasin, "xx");
+
+        free(nom_rayon_1);
+        free(nom_rayon_2);
+        free(nom_resultant);
+    }
     
+    // Sinon si au moins un n'existe pas
+    else
+    {
+        printf("ERREUR: l'un des rayons (ou les 2) est inexistant.");
+    }
 }
+
+
