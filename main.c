@@ -175,8 +175,10 @@ int main(void)
             }
             case '8' : // Rechercher produit par prix
             {
-                // Récupération de l'input
-
+                float prix_min = getFloatInput("\nPrix minimal du produit ? ");
+                float prix_max = getFloatInput("\nPrix maximal du produit ? ");
+                
+                rechercheProduits(mon_magasin,prix_min, prix_max);
 
                break;
             }

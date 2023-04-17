@@ -356,14 +356,67 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
 
     // On vient de dépasser le dernier produit au prix < au prix courant. On insère 
     if(produitPrecedent == NULL)
+    {
+        nouveauProduit->suivant = rayon->liste_produits;
         rayon->liste_produits = nouveauProduit;
-    else
-        produitPrecedent->suivant = nouveauProduit;
+    }
+
+    else produitPrecedent->suivant = nouveauProduit;
 
     nouveauProduit->suivant = produitCourant; // Pour bien marquer la fin
 
     return 1; // Succès de l'ajout
 }
+
+
+
+
+/* **********************************************
+ * Ajout produit dans la nouvelle structure rayon
+ ********************************************* */
+void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float prix, int quantite, char *nom_rayon) {
+
+    // Si la liste est vide, càd designation = "-1" on ajoute directement le produit
+    if (strcmp((*rayontemp)->designation, "-1") == 0) {
+    (*rayontemp)->designation = malloc(strlen(designation) + 1);
+    strcpy((*rayontemp)->designation, designation);
+    (*rayontemp)->prix = prix;
+    (*rayontemp)->quantite_en_stock = quantite;
+    (*rayontemp)->rayon = malloc(strlen(nom_rayon) + 1);
+    strcpy((*rayontemp)->rayon, nom_rayon);
+    (*rayontemp)->suivant = NULL;
+    return;
+    }
+
+    // Sinon tant qu'on trouve un prix inférieur au produit courant, on avance dans le rayon 
+    T_Rayon_Temp *current = *rayontemp;
+    T_Rayon_Temp *precedent = NULL;
+    while (current != NULL && current->prix < prix) {
+        precedent = current;
+        current = current->suivant;
+    }
+
+    // On crée un nouveau produit à insérer
+    T_Rayon_Temp *nouveau = malloc(sizeof(T_Rayon_Temp));
+    nouveau->designation = malloc(strlen(designation) + 1);
+    strcpy(nouveau->designation, designation);
+    nouveau->prix = prix;
+    nouveau->quantite_en_stock = quantite;
+    nouveau->rayon = malloc(strlen(nom_rayon) + 1);
+    strcpy(nouveau->rayon, nom_rayon);
+    nouveau->suivant = NULL;
+
+    if (precedent == NULL) { // Si insertion en tête
+        nouveau->suivant = *rayontemp;
+        *rayontemp = nouveau;
+    }
+
+    else {
+        nouveau->suivant = current;
+        precedent->suivant = nouveau;
+    }
+}
+
 
 
 
@@ -701,7 +754,7 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
 
     T_Produit *produitprecedent = NULL;
     T_Produit *produitcurrent = rayon->liste_produits;
-
+    printf("\nTEST:%s", produitcurrent->designation);
     // Si le produit est au début
     if (produitcurrent != NULL && strcasecmp(produitcurrent->designation, designation_produit) == 0)
     {
@@ -713,7 +766,8 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
     while (produitcurrent != NULL)
     {
         if (strcasecmp(produitcurrent->designation, designation_produit) == 0)
-        {
+        {   
+            printf("\nTROUVEEEEE");
             produitprecedent->suivant = produitcurrent->suivant;
             free(produitcurrent);
             return 1;
@@ -781,7 +835,63 @@ int supprimerRayon(T_Magasin *magasin, char *nom_rayon) {
  * Recherche des produits se situant dans une fourchette de prix entr�e par l'utilisateur
  ************************************************************************************** */
 void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
-    // TODO
+
+    T_Rayon *rayon_current = magasin->liste_rayons;
+    T_Produit *produit_current = NULL;
+
+    T_Rayon_Temp *rayontemp = NULL; // Tête de la liste à afficher
+    rayontemp = malloc(sizeof(T_Rayon_Temp));
+    rayontemp->designation = malloc(strlen("-1") + 1); // On initialise à -1 pour savoir s'il est vide ou pas
+    strcpy(rayontemp->designation, "-1");
+    rayontemp->suivant = NULL;
+
+
+    // On initialise celui que l'on va itérer, pour conserver le début dans rayontemp
+    T_Rayon_Temp *rayontemp_current = NULL;
+    rayontemp_current = malloc(sizeof(T_Rayon_Temp));
+    rayontemp_current->suivant = NULL;
+
+    while (rayon_current != NULL) // Itérer les rayons
+    {   
+        produit_current = rayon_current->liste_produits;
+        while (produit_current != NULL) // Itérer les produits du rayon
+        {   
+            if (produit_current->prix >= prix_min && produit_current->prix <= prix_max) // Si c'est le bon produit
+            {   
+                printf("PRODUIT %s AJOUTE\n", produit_current->designation);
+                ajouterProduit_RayonTemp(&rayontemp, produit_current->designation, produit_current->prix, produit_current->quantite_en_stock, rayon_current->nom_rayon);
+            }
+            
+            produit_current = produit_current->suivant;
+        }
+        rayon_current = rayon_current->suivant;
+    }
+
+    // A cette étape nous avons construit la liste chainée et elle est prête à être print
+
+    rayontemp_current = rayontemp; // On revient dans la tête. On utilise current pour ne pas perdre la tête pour free la mémoire après
+
+    // Afficher comme: Marque | Prix | Quantité en stock | Rayon 
+    // Normalement c'est déjà trié par prix croissant
+
+    while (rayontemp_current != NULL)
+    {
+        printf("%s --- %.2f --- %d --- %s\n", rayontemp_current->designation, rayontemp_current->prix, rayontemp_current->quantite_en_stock, rayontemp_current->rayon);
+        rayontemp_current = rayontemp_current->suivant;
+    }
+    // On libère la mémoire du rayon temporaire créé
+
+    rayontemp_current = rayontemp;
+    while (rayontemp_current != NULL)
+    {   
+        T_Rayon_Temp *tofree;
+        tofree = rayontemp_current;
+        rayontemp_current = rayontemp_current->suivant;
+        free(tofree->designation);
+        free(tofree->rayon);
+        free(tofree);
+    }
+    free(rayontemp_current);
 }
 
 
@@ -794,3 +904,5 @@ void fusionnerRayons(T_Magasin *magasin) {
     // merge dept
     
 }
+
+
