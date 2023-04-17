@@ -14,8 +14,8 @@ int main(void)
 
 
     // ============= MENU UTILISATEUR ============= */
-    char choix = '0';
-    while (choix != '9') {
+    char choix = 'x';
+    while (choix != '0') {
         printf("\n======================================");
         printf("\n1. Creer un magasin");
         printf("\n2. Ajouter un rayon au magasin");
@@ -25,7 +25,8 @@ int main(void)
         printf("\n6. Supprimer un produit");
         printf("\n7. Supprimer un rayon");
         printf("\n8. Rechercher un produit par prix");
-        printf("\n9. Quitter");
+        printf("\n9. Fusionner 2 rayons");
+        printf("\n0. Quitter");
         printf("\n======================================");
         printf("\n   Votre choix ? ");
         choix = getchar();
@@ -35,8 +36,8 @@ int main(void)
 
 
         
-        char *choixNecessitantMagDefini     = "2345678";    // la liste des choix nécessitant de vérifier si mon_magasin a été initialisé
-        char *choixNecessitantUnRayonDefini = "345678";     // La liste des choix nécessitant de vérifier si au moins un rayon a été initialisé.
+        char *choixNecessitantMagDefini     = "23456789";    // la liste des choix nécessitant de vérifier si mon_magasin a été initialisé
+        char *choixNecessitantUnRayonDefini = "3456789";     // La liste des choix nécessitant de vérifier si au moins un rayon a été initialisé.
                                                             //  choixNecessitantUnRayonDefini est composé d'une partie des choixNecessitantMagDefini
 
         // TODO : dans l'idéal, il faudrait virer cette partie pour intégrer les tests directement dans les fonctions
@@ -57,6 +58,10 @@ int main(void)
         }
 
         switch (choix) {
+            case '0' :
+                printf("\n======== PROGRAMME TERMINE ========\n");
+                break;
+
             case '1' : // Créer magasin
 
                 if(isStoreSet(mon_magasin, false)) { // Si le magasin existe déjà
@@ -182,8 +187,12 @@ int main(void)
 
                break;
             }
-            case '9' :
-                printf("\n======== PROGRAMME TERMINE ========\n");
+            case '9' : // Fusionner 2 rayons
+
+                if (isStoreSet(mon_magasin, true)){
+                    fusionnerRayons(mon_magasin);
+                }
+
                 break;
 
             default :

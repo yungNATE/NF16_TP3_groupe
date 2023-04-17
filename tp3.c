@@ -897,9 +897,115 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
  * Fusionner deux rayons
  ********************* */
 void fusionnerRayons(T_Magasin *magasin) {
-    // TODO
-    // merge dept
     
+    char *nom_rayon_1 = getStringInput("\nNom du rayon 1? ");
+    char *nom_rayon_2 = getStringInput("\nNom du rayon 2 ? ");
+    char *nom_resultant = getStringInput("\nNom du rayon résultant?");
+
+    if (isDeptSet(magasin, nom_rayon_1, true) && isDeptSet(magasin, nom_rayon_2, true)) // Si les 2 rayons existent
+        {
+        // Identification des rayons à fusionner
+        T_Rayon *rayon_1 = getDeptByName(magasin, nom_rayon_1, true);
+        T_Rayon *rayon_2 = getDeptByName(magasin, nom_rayon_2, true);
+        
+        T_Produit *prayon_1 = rayon_1->liste_produits;
+        T_Produit *prayon_2 = rayon_2->liste_produits;
+
+        // Ca va nous permettre de créer le nouveau rayon avec le même nom de ceux précédents
+        // On remplace leur nom. De toute façon on les supprime après
+
+        strcpy(rayon_1->nom_rayon, "x");
+        strcpy(rayon_2->nom_rayon, "xx");
+
+        // Création et identification du nouveau rayon
+        ajouterRayon(magasin, nom_resultant);
+        T_Rayon *rayon_resultant = getDeptByName(magasin, nom_resultant, true);
+
+        // Regarder si un des rayons est vide
+
+        
+        // Juste pour regrouper les cas particuliers avec if..else
+        if ((prayon_1 == NULL && prayon_2 == NULL) || (prayon_1 != NULL && prayon_2 == NULL) || (prayon_1 == NULL && prayon_2 != NULL))
+        {
+            if (prayon_1 == NULL && prayon_2 == NULL)
+            {
+                // on ne fait rien; à la fin on supprime les 2 rayons et on laisse juste le nouveau
+            }
+
+            else if (prayon_1 != NULL && prayon_2 == NULL)
+            {
+                rayon_resultant->liste_produits = prayon_1;
+            }
+
+            else if (prayon_1 == NULL && prayon_2 != NULL)
+            {
+                rayon_resultant->liste_produits = prayon_2;
+            }
+        }
+
+        else 
+        {
+            // Marquer le début du rayon avec le produit le moins cher
+            if (prayon_1->prix >= prayon_2->prix)
+            {
+                rayon_resultant->liste_produits = prayon_2;
+                prayon_2 = prayon_2->suivant;
+            }
+
+            else
+            {
+                rayon_resultant->liste_produits = prayon_1;
+                prayon_1 = prayon_1->suivant;
+            }
+
+            T_Produit *buffer = rayon_resultant->liste_produits;
+
+            while (prayon_1 != NULL && prayon_2 != NULL)
+            {
+                if (prayon_1->prix >= prayon_2->prix)
+                {   
+                    buffer->suivant = prayon_2;
+                    buffer = prayon_2;
+                    prayon_2 = prayon_2->suivant;
+                }
+
+                else
+                {
+                    buffer->suivant = prayon_1;
+                    buffer = prayon_1;
+                    prayon_1 = prayon_1->suivant;
+                }
+            }
+
+            if (prayon_1 == NULL && prayon_2 != NULL)
+            {
+                buffer->suivant = prayon_2;
+            }
+
+            if (prayon_1 != NULL && prayon_2 == NULL)
+            {
+                buffer->suivant = prayon_1;
+            }
+        }
+        // Dans TOUS LES CAS:
+        // On supprime ces rayons
+        // Ils vont quand même pointer sur le premier produit, on met NULL pour pas supprimer les produits avec
+        rayon_1->liste_produits = NULL;
+        rayon_2->liste_produits = NULL;
+
+        supprimerRayon(magasin, "x");
+        supprimerRayon(magasin, "xx");
+
+        free(nom_rayon_1);
+        free(nom_rayon_2);
+        free(nom_resultant);
+    }
+    
+    // Sinon si au moins un n'existe pas
+    else
+    {
+        printf("ERREUR: l'un des rayons (ou les 2) est inexistant.");
+    }
 }
 
 
