@@ -9,6 +9,15 @@
 int main(void)
 { 
 
+    // char *tableau1[] = {"Nom", "Alice", "Bob", "Charlie", NULL};
+    // char *tableau2[] = {"Age", "25", "30", "35", NULL};
+    // char *tableau3[] = {"Profession", "IngÇnieur", "MÇdecin", "Avocat", "Vendeur", NULL};
+    // char *tableau4[] = {"Ville", "Tokyo", NULL};
+    // char *tableau5[] = {"Ville", "Tokyo", NULL};
+    // char *tableau6[] = {"Ville", "Tokyo", NULL};
+    // char **tableaux[] = {tableau1, tableau2, tableau3, tableau4, tableau5, tableau6, NULL};
+    // afficherTableau(tableaux);
+
     
     T_Magasin *mon_magasin = NULL;
 
@@ -17,7 +26,7 @@ int main(void)
     char choix = 'x';
     while (choix != '0') {
         printf("\n======================================");
-        printf("\n1. Creer un magasin");
+        printf("\n1. CrÇer un magasin");
         printf("\n2. Ajouter un rayon au magasin");
         printf("\n3. Ajouter un produit dans un rayon");
         printf("\n4. Afficher les rayons du magasin");
@@ -32,16 +41,16 @@ int main(void)
         choix = getchar();
         viderBuffer(); // supprimer de l'entr?e standard le retour charriot et les ?ventuels caract?res suppl?mentaires tap?s par l'utilisateur
 
-        printf("\nChoix %c sÇlectionnÇ \n", choix);
+        printf("\nChoix %c s√©lectionn√© \n", choix);
 
 
         
-        char *choixNecessitantMagDefini     = "2345678";    // la liste des choix nÇcessitant de vÇrifier si mon_magasin a ÇtÇ initialisÇ
-        char *choixNecessitantUnRayonDefini = "345678";     // La liste des choix nÇcessitant de vÇrifier si au moins un rayon a ÇtÇ initialisÇ.
-                                                            //  choixNecessitantUnRayonDefini est composÇ d'une partie des choixNecessitantMagDefini
+        char *choixNecessitantMagDefini     = "2345678";    // la liste des choix n√©cessitant de v√©rifier si mon_magasin a √©t√© initialis√©
+        char *choixNecessitantUnRayonDefini = "345678";     // La liste des choix n√©cessitant de v√©rifier si au moins un rayon a √©t√© initialis√©.
+                                                            //  choixNecessitantUnRayonDefini est compos√© d'une partie des choixNecessitantMagDefini
 
-        // TODO : dans l'idÇal, il faudrait virer cette partie pour intÇgrer les tests directement dans les fonctions
-        // Pour Çviter la redondance de isStoreSet & isAnyDeptSet dans le switch
+        // TODO : dans l'id√©al, il faudrait virer cette partie pour int√©grer les tests directement dans les fonctions
+        // Pour √©viter la redondance de isStoreSet & isAnyDeptSet dans le switch
         if (isCharInArray(choix, choixNecessitantMagDefini)){ 
             // Si aucun magasin n'existe pour les choixNecessitantMagDefini
             if(! isStoreSet(mon_magasin, true)) {
@@ -62,16 +71,16 @@ int main(void)
                 printf("\n======== PROGRAMME TERMINE ========\n");
                 break;
 
-            case '1' : // CrÇer magasin
+            case '1' : // Cr√©er magasin
 
-                if(isStoreSet(mon_magasin, false)) { // Si le magasin existe dÇjÖ
-                    printf("\nUn magasin existe dÇjÖ ! ");
+                if(isStoreSet(mon_magasin, false)) { // Si le magasin existe d√©j√©
+                    printf("\nUn magasin existe d√©j√© ! ");
     
                     char reponse = 'n'; // Intialisation
                     do
                     {
                         if(reponse != 'o' && reponse != 'n') {
-                            printf("\nERREUR : seulement 'o' et 'n' sont acceptÇs en rÇponse ! ");
+                            printf("\nERREUR : seulement 'o' et 'n' sont accept√©s en r√©ponse ! ");
                         }
 
                         printf("\nVoulez-vous le remplacer ? (o/n) ");
@@ -88,41 +97,52 @@ int main(void)
                 char *nomMagasin = getStringInput("\nNom du magasin ? ");
 
                 mon_magasin = creerMagasin(nomMagasin);
+                free(nomMagasin);
                 printf("\nMagasin %s crÇÇ ! ", mon_magasin->nom);
                 break;
 
             case '2' : // Ajouter rayon
             {
-                // RÇcupÇration de l'input
+                // R√©cup√©ration de l'input
                 char *nomRayon = getStringInput("\nNom du rayon ? ");
 
-                // CrÇation
+                // Cr√©ation
                 ajouterRayon(mon_magasin, nomRayon);
-                printf("\nRayon %s ajoutÇ ! ", nomRayon);
+                printf("\nRayon %s ajoutÇ !", nomRayon);
 
+                T_Rayon *rayons = mon_magasin->liste_rayons;
+                while(rayons != NULL) {
+                    printf("\nRayons : %s.\n", rayons->nom_rayon);
+                    rayons = rayons->suivant;
+                }
+                printf("\n");
+
+                free(nomRayon);
                 break;
             }
 
             case '3' : // Ajouter produit
             {
-                // rÇcupÇration de l'input
+                // r√©cup√©ration de l'input
                 char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
                 char *nomProduitAAjouter = getStringInput("\nNom du produit ? ");
                 float prix = getFloatInput("\nPrix du produit ? ");
-                int quantite = getIntInput("\nQuantitÇ du produit ? ");
+                int quantite = getIntInput("\nQuantit√© du produit ? ");
 
 
-                //crÇation
+                //cr√©ation
                 T_Rayon *rayonCourant = mon_magasin->liste_rayons;
                 while (rayonCourant != NULL)
                 {   
-                    if (strcasecmp(rayonCourant->nom_rayon, nomRayonRecherche) == 0)
-                    {   
+                    if (strcasecmp(rayonCourant->nom_rayon, nomRayonRecherche) == 0) {   
                         ajouterProduit(rayonCourant, nomProduitAAjouter, prix, quantite);
                         break;
                     }
                     rayonCourant = rayonCourant->suivant;
                 }
+
+                free(nomRayonRecherche);
+                free(nomProduitAAjouter);
 
                 break;
             }
@@ -135,22 +155,13 @@ int main(void)
             case '5' : // Afficher produits d'un rayon
             {
                 // Rappel des noms des rayons
-                T_Rayon *rayonCourant = mon_magasin->liste_rayons;
+                afficherRayons(mon_magasin);
 
-                // TODO : crÇer une fonction pour áa cf TODO afficherMagasin() 
-                char *charDeSeparation = " | "; 
-                printf("\nRayons existants : ");
-                while (rayonCourant != NULL) {
-                    if (rayonCourant->suivant == NULL) charDeSeparation = "";
-                    
-                    printf("%s%s ", rayonCourant->nom_rayon, charDeSeparation);
-                    rayonCourant = rayonCourant->suivant;
-                }
-                // Fin du TODO
+                char *nomRayonRecherche = getStringInput("\nNom du rayon √† d√©tailler ? ");
 
 
-                char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
                 T_Rayon *rayonRecherche = getDeptByName(mon_magasin, nomRayonRecherche, true);
+                free(nomRayonRecherche);
 
                 if(rayonRecherche != NULL) afficherRayon(rayonRecherche);
 
@@ -166,6 +177,8 @@ int main(void)
                     supprimerProduit(rayons, nomProduitASupprimer);
                 }
 
+                free(nomRayonDuProduitASupprimer);
+                free(nomProduitASupprimer);
                 break;
             }
             case '7' : // Supprimer rayon
@@ -176,16 +189,17 @@ int main(void)
                     supprimerRayon(mon_magasin, nomRayonASupprimer);
                 }
 
-               break;
+                free(nomRayonASupprimer);
+                break;
             }
             case '8' : // Rechercher produit par prix
             {
                 float prix_min = getFloatInput("\nPrix minimal du produit ? ");
                 float prix_max = getFloatInput("\nPrix maximal du produit ? ");
                 
-                rechercheProduits(mon_magasin,prix_min, prix_max);
+                rechercheProduits(mon_magasin, prix_min, prix_max);
 
-               break;
+                break;
             }
             case '9' : // Fusionner 2 rayons
 
