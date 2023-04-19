@@ -110,107 +110,103 @@ int main(void)
                     ajouterRayon(mon_magasin, nomRayon);
                     printf("\nRayon %s ajout� !", nomRayon);
 
-                    T_Rayon *rayons = mon_magasin->liste_rayons;
-                    while(rayons != NULL) {
-                        printf("\nRayons : %s.\n", rayons->nom_rayon);
-                        rayons = rayons->suivant;
-                    }
-                    printf("\n");
-
                     free(nomRayon);
                     break;
-                }
+            }
 
-                case '3' : // Ajouter produit
-                {
-                    // récupération de l'input
-                    char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
-                    char *nomProduitAAjouter = getStringInput("\nNom du produit ? ");
-                    float prix = getFloatInput("\nPrix du produit ? ");
-                    int quantite = getIntInput("\nQuantit� du produit ? ");
+            case '3' : // Ajouter produit
+            {
+                // récupération de l'input
+                char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
+                char *nomProduitAAjouter = getStringInput("\nNom du produit ? ");
+                float prix = getFloatInput("\nPrix du produit ? ");
+                int quantite = getIntInput("\nQuantit� du produit ? ");
 
 
-                    //création
-                    T_Rayon *rayonCourant = mon_magasin->liste_rayons;
-                    while (rayonCourant != NULL)
-                    {   
-                        if (strcasecmp(rayonCourant->nom_rayon, nomRayonRecherche) == 0) {   
-                            ajouterProduit(rayonCourant, nomProduitAAjouter, prix, quantite);
-                            break;
-                        }
-                        rayonCourant = rayonCourant->suivant;
+                //création
+                T_Rayon *rayonCourant = mon_magasin->liste_rayons;
+                while (rayonCourant != NULL)
+                {   
+                    if (strcasecmp(rayonCourant->nom_rayon, nomRayonRecherche) == 0) {   
+                        ajouterProduit(rayonCourant, nomProduitAAjouter, prix, quantite);
+                        break;
                     }
-
-                    free(nomRayonRecherche);
-                    free(nomProduitAAjouter);
-
-                    break;
+                    rayonCourant = rayonCourant->suivant;
                 }
-                case '4' : // Afficher rayons
-                {
-                    afficherMagasin(mon_magasin);
 
-                    break;
+                free(nomRayonRecherche);
+                free(nomProduitAAjouter);
+
+                break;
+            }
+            case '4' : // Afficher rayons
+            {
+                afficherMagasin(mon_magasin);
+
+                break;
+            }
+            case '5' : // Afficher produits d'un rayon
+            {
+                // Rappel des noms des rayons
+                afficherRayons(mon_magasin);
+
+                char *nomRayonRecherche = getStringInput("\nNom du rayon à détailler ? ");
+
+
+                T_Rayon *rayonRecherche = getDeptByName(mon_magasin, nomRayonRecherche, true);
+                free(nomRayonRecherche);
+
+                if(rayonRecherche != NULL) afficherRayon(rayonRecherche);
+
+                break;
+            }
+            case '6' : // Supprimer produit
+            {   
+                // TODO : rappeller les rayons     
+                char *nomRayonDuProduitASupprimer = getStringInput("\nNom du rayon ? ");
+
+                // TODO : rappeller les produits du rayon
+                char *nomProduitASupprimer = getStringInput("\nNom du produit ? ");
+
+                if (isDeptSet(mon_magasin, nomRayonDuProduitASupprimer, true)){
+                    T_Rayon *rayons = getDeptByName(mon_magasin, nomRayonDuProduitASupprimer, true);
+                    supprimerProduit(rayons, nomProduitASupprimer);
                 }
-                case '5' : // Afficher produits d'un rayon
-                {
-                    // Rappel des noms des rayons
-                    afficherRayons(mon_magasin);
 
-                    char *nomRayonRecherche = getStringInput("\nNom du rayon à détailler ? ");
+                free(nomRayonDuProduitASupprimer);
+                free(nomProduitASupprimer);
+                break;
+            }
+            case '7' : // Supprimer rayon
+            {
+                char *nomRayonASupprimer = getStringInput("\nNom du rayon ? ");
 
-
-                    T_Rayon *rayonRecherche = getDeptByName(mon_magasin, nomRayonRecherche, true);
-                    free(nomRayonRecherche);
-
-                    if(rayonRecherche != NULL) afficherRayon(rayonRecherche);
-
-                    break;
+                if (isDeptSet(mon_magasin, nomRayonASupprimer, true)){
+                    supprimerRayon(mon_magasin, nomRayonASupprimer);
                 }
-                case '6' : // Supprimer produit
-                {                
-                    char *nomRayonDuProduitASupprimer = getStringInput("\nNom du rayon ? ");
-                    char *nomProduitASupprimer = getStringInput("\nNom du produit ? ");
 
-                    if (isDeptSet(mon_magasin, nomRayonDuProduitASupprimer, true)){
-                        T_Rayon *rayons = getDeptByName(mon_magasin, nomRayonDuProduitASupprimer, true);
-                        supprimerProduit(rayons, nomProduitASupprimer);
-                    }
+                free(nomRayonASupprimer);
+                break;
+            }
+            case '8' : // Rechercher produit par prix
+            {
+                float prix_min = getFloatInput("\nPrix minimal du produit ? ");
+                float prix_max = getFloatInput("\nPrix maximal du produit ? ");
+                
+                rechercheProduits(mon_magasin, prix_min, prix_max);
 
-                    free(nomRayonDuProduitASupprimer);
-                    free(nomProduitASupprimer);
-                    break;
+                break;
+            }
+            case '9' : // Fusionner 2 rayons
+            {
+                if (isStoreSet(mon_magasin, true)){
+                    fusionnerRayons(mon_magasin);
                 }
-                case '7' : // Supprimer rayon
-                {
-                    char *nomRayonASupprimer = getStringInput("\nNom du rayon ? ");
 
-                    if (isDeptSet(mon_magasin, nomRayonASupprimer, true)){
-                        supprimerRayon(mon_magasin, nomRayonASupprimer);
-                    }
-
-                    free(nomRayonASupprimer);
-                    break;
-                }
-                case '8' : // Rechercher produit par prix
-                {
-                    float prix_min = getFloatInput("\nPrix minimal du produit ? ");
-                    float prix_max = getFloatInput("\nPrix maximal du produit ? ");
-                    
-                    rechercheProduits(mon_magasin, prix_min, prix_max);
-
-                    break;
-                }
-                case '9' : // Fusionner 2 rayons
-
-                    if (isStoreSet(mon_magasin, true)){
-                        fusionnerRayons(mon_magasin);
-                    }
-
-                    break;
-
-                default :
-                    printf("\n\nERREUR : votre choix n'est pas valide ! ");
+                break;
+            }
+            default :
+                printf("\n\nERREUR : votre choix n'est pas valide ! ");
             }
             printf("\n\n\n");
 
