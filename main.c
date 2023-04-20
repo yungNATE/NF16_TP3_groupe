@@ -219,7 +219,9 @@ int main(void)
             }
             case '9' : // Fusionner 2 rayons
             {
-                if (isStoreSet(mon_magasin, true)){
+                afficherRayons(mon_magasin);
+
+                if (isAnyDeptSet(mon_magasin, true)){
                     fusionnerRayons(mon_magasin);
                 }
 

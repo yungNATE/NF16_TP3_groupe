@@ -319,12 +319,12 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
                 {
                     printf("\nERREUR : seulement 'o' et 'n' sont accept�s en r�ponse ! ");
                 }
-                printf("\nVoulez-vous simplement augmenter sa quantit� ? (o/n) ");
+                printf("\nVoulez-vous augmenter sa quantit� ? (o/n) ");
                 reponse = getchar();
                 viderBuffer();
             } while (reponse != 'o' && reponse != 'n'); 
 
-            if(reponse == 'o') 
+            if(true) 
             {
                 produit->quantite_en_stock += quantite;
                 if (prix != produit->prix)
@@ -953,6 +953,11 @@ void fusionnerRayons(T_Magasin *magasin) {
     char *nom_rayon_1 = getStringInput("\nNom du rayon 1 ? ");
     char *nom_rayon_2 = getStringInput("\nNom du rayon 2 ? ");
     char *nom_resultant = getStringInput("\nNom du rayon résultant ? ");
+
+    if(strcmp(nom_rayon_1, nom_rayon_2) == 0) {
+        printf("ERREUR: Les deux rayons sont identiques.");
+        return;
+    }
 
     if ( (!isDeptSet(magasin, nom_rayon_1, true)) || (!isDeptSet(magasin, nom_rayon_2, true)) ){
         printf("ERREUR: Au moins l'un des rayons est inexistant.");
