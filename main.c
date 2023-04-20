@@ -108,7 +108,6 @@ int main(void)
 
                     // CrÃ©ation
                     ajouterRayon(mon_magasin, nomRayon);
-                    printf("\nRayon %s ajout‚ !", nomRayon);
 
                     free(nomRayon);
                     break;
@@ -116,8 +115,16 @@ int main(void)
 
             case '3' : // Ajouter produit
             {
+                afficherRayons(mon_magasin);
+
                 // rÃ©cupÃ©ration de l'input
                 char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
+
+                if(!getDeptByName(mon_magasin, nomRayonRecherche, true)) { 
+                    printf("Merci de r‚essayer avec un rayon existant.");
+                    break; 
+                }
+
                 char *nomProduitAAjouter = getStringInput("\nNom du produit ? ");
                 float prix = getFloatInput("\nPrix du produit ? ");
                 int quantite = getIntInput("\nQuantit‚ du produit ? ");
@@ -162,10 +169,23 @@ int main(void)
             }
             case '6' : // Supprimer produit
             {   
-                // TODO : rappeller les rayons     
+                afficherRayons(mon_magasin);
                 char *nomRayonDuProduitASupprimer = getStringInput("\nNom du rayon ? ");
 
-                // TODO : rappeller les produits du rayon
+                T_Rayon *rayonDuProduitASupprimer = getDeptByName(mon_magasin, nomRayonDuProduitASupprimer, true);
+
+                if(! rayonDuProduitASupprimer ) { 
+                    printf("Merci de r‚essayer avec un rayon existant.");
+                    break; 
+                }
+
+                if(rayonDuProduitASupprimer->liste_produits == NULL) {
+                    printf("Ce rayon ne contient aucun produit.");
+                    break;
+                }
+
+
+                afficherRayon(rayonDuProduitASupprimer);
                 char *nomProduitASupprimer = getStringInput("\nNom du produit ? ");
 
                 if (isDeptSet(mon_magasin, nomRayonDuProduitASupprimer, true)){

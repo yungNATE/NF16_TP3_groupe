@@ -214,6 +214,44 @@ T_Magasin *creerMagasin(char *nom) {
 }
 
 
+/* **************************************************
+ * Alerte pour les fonctions de r�cup�ration de rayon
+ ************************************************** */
+void alert_DeptDoesNotExists(char *nomRayonRecherche) {
+    printf("\nLe rayon %s n'existe pas ! ", nomRayonRecherche);
+}
+
+/* ***************************************************************
+ * R�cup�re le T_Rayon correspondant au nom pass� en param�tre
+ ************************************************************** */
+T_Rayon *getDeptByName(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
+    T_Rayon *rayonCourant = magasin->liste_rayons;
+
+
+    while(rayonCourant != NULL) {
+        if(strcmp(rayonCourant->nom_rayon, nomRayon) == 0) return rayonCourant;
+        rayonCourant = rayonCourant->suivant;
+    }
+    printf("\n");
+
+    if(shouldWarnUser) alert_DeptDoesNotExists(nomRayon);
+    return NULL;
+}
+
+
+/* ***************************************************************
+ * V�rifie si, au sein du magasin, le rayon pass� en param existe
+ ************************************************************** */
+bool isDeptSet(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
+    if(! isAnyDeptSet(magasin, shouldWarnUser)) return false;   // Juste au cas o�, on v�rifie qu'au moins un rayon soit bien d�fini.
+
+    T_Rayon *rayon = getDeptByName(magasin, nomRayon, false);
+    if(rayon != NULL) return true;
+
+    if(shouldWarnUser) alert_DeptDoesNotExists(nomRayon);
+    return false;
+}
+
 
 /* ********************************
  * Ajout d'un rayon dans un magasin
@@ -234,7 +272,7 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
     // Test si rayon existe d�j�
     if (rayonCourant != NULL && strcmp(rayonCourant->nom_rayon, nomRayon) == 0)
     {
-        printf("Le rayon existe d�j�.\n");
+        printf("Le rayon %s existe déjà.\n", nomRayon);
         return 0;
     }
 
@@ -248,6 +286,9 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
         rayonPrecedent->suivant = nouveauRayon;
 
     nouveauRayon->suivant = rayonCourant; // Pour bien marquer la fin
+
+    printf("\nRayon %s ajouté !", nomRayon);
+
     return 1;
 }
 
@@ -724,44 +765,6 @@ bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser) {
 }
 
 
-/* **************************************************
- * Alerte pour les fonctions de r�cup�ration de rayon
- ************************************************** */
-void alert_DeptDoesNotExists(char *nomRayonRecherche) {
-    printf("\nLe rayon %s n'existe pas ! ", nomRayonRecherche);
-}
-
-/* ***************************************************************
- * R�cup�re le T_Rayon correspondant au nom pass� en param�tre
- ************************************************************** */
-T_Rayon *getDeptByName(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
-    T_Rayon *rayonCourant = magasin->liste_rayons;
-
-
-    while(rayonCourant != NULL) {
-        if(strcmp(rayonCourant->nom_rayon, nomRayon) == 0) return rayonCourant;
-        rayonCourant = rayonCourant->suivant;
-    }
-    printf("\n");
-
-    if(shouldWarnUser) alert_DeptDoesNotExists(nomRayon);
-    return NULL;
-}
-
-
-/* ***************************************************************
- * V�rifie si, au sein du magasin, le rayon pass� en param existe
- ************************************************************** */
-bool isDeptSet(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
-    if(! isAnyDeptSet(magasin, shouldWarnUser)) return false;   // Juste au cas o�, on v�rifie qu'au moins un rayon soit bien d�fini.
-
-    T_Rayon *rayon = getDeptByName(magasin, nomRayon, false);
-    if(rayon != NULL) return true;
-
-    if(shouldWarnUser) alert_DeptDoesNotExists(nomRayon);
-    return false;
-}
-
 /* **************************************
  * Suppression d'un produit dans un rayon
  ************************************** */
@@ -771,7 +774,7 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
     T_Produit *produitcurrent = rayon->liste_produits;
 
     // Si le produit est au d�but
-    if (produitcurrent != NULL && strcasecmp(produitcurrent->designation, designation_produit) == 0)
+    if (produitcurrent != NULL && strcmp(produitcurrent->designation, designation_produit) == 0)
     {
         rayon->liste_produits = produitcurrent->suivant;
         free(produitcurrent);
@@ -780,7 +783,7 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
 
     while (produitcurrent != NULL)
     {
-        if (strcasecmp(produitcurrent->designation, designation_produit) == 0)
+        if (strcmp(produitcurrent->designation, designation_produit) == 0)
         {   
             produitprecedent->suivant = produitcurrent->suivant;
             free(produitcurrent);
@@ -807,7 +810,7 @@ int supprimerRayon(T_Magasin *magasin, char *nom_rayon) {
     T_Produit *produitcurrent = NULL;
 
     // Si le rayon est au d�but
-    if (rayonCourant != NULL && strcasecmp(rayonCourant->nom_rayon, nom_rayon) == 0)
+    if (rayonCourant != NULL && strcmp(rayonCourant->nom_rayon, nom_rayon) == 0)
     {
         magasin->liste_rayons = rayonCourant->suivant;
         produitcurrent = rayonCourant->liste_produits;
@@ -822,7 +825,7 @@ int supprimerRayon(T_Magasin *magasin, char *nom_rayon) {
 
     while (rayonCourant != NULL)
     {
-        if (strcasecmp(rayonCourant->nom_rayon, nom_rayon) == 0)
+        if (strcmp(rayonCourant->nom_rayon, nom_rayon) == 0)
         {   
             produitcurrent = rayonCourant->liste_produits;
             while (produitcurrent != NULL)
@@ -858,14 +861,13 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
     strcpy(rayontemp->designation, "-1");
     rayontemp->suivant = NULL;
 
-
     // On initialise celui que l'on va it�rer, pour conserver le d�but dans rayontemp
     T_Rayon_Temp *produitsTemp = NULL;
     produitsTemp = malloc(sizeof(T_Rayon_Temp));
     produitsTemp->suivant = NULL;
 
     while (rayon_current != NULL) // Parcourir les rayons
-    {   
+    {
         produit_current = rayon_current->liste_produits;
         while (produit_current != NULL) // Itérer sur les produits du rayon
         {   
@@ -876,6 +878,11 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
             produit_current = produit_current->suivant;
         }
         rayon_current = rayon_current->suivant;
+    }
+
+    if(strcmp(rayontemp->designation, "-1") == 0) { // Si la liste est vide
+        printf("Aucun produit ne correspond à votre recherche.\n");
+        return;
     }
 
     // A cette étape nous avons construit la liste chainée
@@ -1037,6 +1044,7 @@ void fusionnerRayons(T_Magasin *magasin) {
             buffer->suivant = prayon_1;
         }
     }
+
     // Dans TOUS LES CAS:
     // On supprime ces rayons
     // Ils vont quand m�me pointer sur le premier produit, on met NULL pour pas supprimer les produits avec
