@@ -466,6 +466,7 @@ void afficherTableau(char ***tableaux) {
 
     // Calcul le nombre de rangées du tableau + largeur des colonnes
     int largeur_colonne[nb_colonnes];
+    int largeur_totale_colonnes = 0;
     int hauteur_colonnes[nb_colonnes];
 
     for (i = 0; i < nb_colonnes; i++) {
@@ -473,6 +474,7 @@ void afficherTableau(char ***tableaux) {
         nb_rangees = 0;
 
         while (tableaux[i][nb_rangees] != NULL) {
+            largeur_totale_colonnes += strlen(tableaux[i][nb_rangees]);
             if (strlen(tableaux[i][nb_rangees]) > largeur_colonne[i]) {
                 largeur_colonne[i] = strlen(tableaux[i][nb_rangees]);
             }
@@ -487,15 +489,26 @@ void afficherTableau(char ***tableaux) {
     
 
     //* Affichage du tableau
-    // Affichage de la première ligne
-    printf("+");
-    for (i = 0; i < nb_colonnes; i++) {
-        for (j = 0; j < largeur_colonne[i] + 2; j++) {
-            printf("-");
-        }
-        printf("+");
+    const char charLigne   = '-';
+    const char charCoin    = '+';
+
+    // construction des lignes de séparation
+    char* ligne = malloc((largeur_totale_colonnes + 1) * sizeof(char));
+    if (ligne == NULL) {
+        printf("Erreur : impossible d'allouer de la mémoire.\n");
+        exit(1);
     }
-    printf("\n");
+    int pos = 0;
+    ligne[pos++] = charCoin;
+    for (i = 0; i < nb_colonnes; i++) {
+        pos += sprintf(&ligne[pos], "%s", getRepeatedChar(largeur_colonne[i] + 2, '-'));
+        ligne[pos++] = charCoin;
+    }
+    ligne[pos++] = '\n';
+    ligne[pos] = '\0';
+
+    // Affichage de la première ligne
+    printf("%s", ligne);
 
     // Affichage des entêtes de colonne
     printf("|");
@@ -506,14 +519,8 @@ void afficherTableau(char ***tableaux) {
     printf("\n");
 
     // Affichage de la ligne de séparation
-    printf("+");
-    for (i = 0; i < nb_colonnes; i++) {
-        for (j = 0; j < largeur_colonne[i] + 2; j++) {
-            printf("-");
-        }
-        printf("+");
-    }
-    printf("\n");
+    printf("%s", ligne);
+
 
     // Affichage du contenu de la colonne
     for (i = 0; i < nbMax_rangees - 1; i++) {
@@ -531,14 +538,10 @@ void afficherTableau(char ***tableaux) {
     }
 
     // Affichage de la dernière ligne
-    printf("+");
-    for (i = 0; i < nb_colonnes; i++) {
-        for (j = 0; j < largeur_colonne[i] + 2; j++) {
-            printf("-");
-        }
-        printf("+");
-    }
+    printf("%s", ligne);
     printf("\n");
+
+    free(ligne);
 
     return;
 }
