@@ -8,7 +8,7 @@
 /* *********************
  * Fonctions utilitaires
  ********************* */
-// Vider le buffer (utile quand on utlise des getchar() )
+// Vider le buffer (utile quand on utilise des getchar() )
 void viderBuffer() {
     int c = 0;
     while (c != '\n' && c != EOF) {
@@ -16,92 +16,22 @@ void viderBuffer() {
     }
 }
 
-// Fonction pour vider l'�cran (normalement iml�ment�e via de base clrscr(), mais ne fonctionne pas)
-void clear_screen(){
-    printf("\e[1;1H\e[2J");
-}
-
 // remplace "\n" par "\0" dans un string
 void replaceNewLine_WithNullTerminator(char *str) {
     str[strcspn(str, "\n")] = '\0';
 }
 
-// Longueur d'un integer (utile pour g�n�rer un beau tableau)
-int getNumLength(int num) {
-    int length = 0;
-
-    if (num == 0)
-    {
-        return 1;
-    }
-
-    while (num != 0) {
-        num /= 10;
-        ++length;
-    }
-    return length;
-}
-
-// Longueur d'un float
-int getFloatNumLength(float num) {
-    int intNum = (int)num;  // convert float to integer
-    int length = 0;
-
-    if (intNum == 0)
-    {
-        return 1;
-    }
-
-    while (intNum != 0) {
-        intNum /= 10;
-        ++length;
-    }
-    return length;
-}
-
-
-// TODO : g�n�raliser les fonctions getXInput 
-// * get X input ; permet de s'assurer qu'on input bien un X + prompt l'utilisateur
-
-/*
-enum getInputTypes { STRING, INT, FLOAT };
-char *getXInput(char *prompt, enum getInputTypes type, char *args){
-    //* WIP
-    int scanfReturn;
-    float prix; //.....
-
-    //switch en fonction du type pour param�trer le do while
-    
-
-
-    do {
-        printf("%s", prompt);
-        scanfReturn = scanf("%f", &prix);
-        viderBuffer();
-
-        if (scanfReturn == 0) {
-            printf("\nERREUR : le prix doit �tre un nombre ! ");
-        }
-    } 
-    while (scanfReturn == 0);
-
-    return "";
-}
-
-*/
-// getStringInput de string custom
+// Les fonctions getTypeInput() permettent de s'assurer qu'on input bien le type recherché
 char *getStringInput(char *prompt){
     printf("%s", prompt);
 
     char *input = malloc(sizeof(char) * 100);
     fgets(input, 100, stdin);
     replaceNewLine_WithNullTerminator(input);
-    fflush(stdin); // TODO : v�rifier si utile
+    fflush(stdin); // TODO : vérifier si utile
     
     return input;
 }
-
-// Ppermet de s'assurer qu'on input bien un float
 float getFloatInput(char *prompt){
     int scanfReturn;
     float prix;
@@ -112,15 +42,13 @@ float getFloatInput(char *prompt){
         viderBuffer();
 
         if (scanfReturn == 0) {
-            printf("\nERREUR : le prix doit �tre un nombre ! ");
+            printf("\nERREUR : le prix doit être un nombre ! ");
         }
     } 
     while (scanfReturn == 0);
 
     return prix;
 }
-
-// gPermet de s'assurer qu'on input bien un int
 int getIntInput(char *prompt){
     int scanfReturn;
     int prix;
@@ -131,7 +59,7 @@ int getIntInput(char *prompt){
         viderBuffer();
 
         if (scanfReturn == 0) {
-            printf("\nERREUR : le prix doit �tre un nombre ! ");
+            printf("\nERREUR : le prix doit être un nombre ! ");
         }
     } 
     while (scanfReturn == 0);
@@ -139,7 +67,7 @@ int getIntInput(char *prompt){
     return prix;
 }
 
-// Fonction pour v�rifier si un char est dans un tableau de char
+// Test la présence d'un char au sein d'un tableau
 bool isCharInArray(char c, char *array) {
     int i = 0;
     while (array[i] != '\0') {
@@ -153,7 +81,7 @@ bool isCharInArray(char c, char *array) {
 
 
 /* **********************************
- * Cr�ation et initialisation Produit
+ * Création et initialisation Produit
  ********************************** */
 T_Produit *creerProduit(char *designation, float prix, int quantite) {
     if(quantite <= 0) return NULL;
@@ -162,10 +90,10 @@ T_Produit *creerProduit(char *designation, float prix, int quantite) {
     T_Produit *nouveauProduit = NULL;
 
     nouveauProduit = malloc(sizeof(T_Produit));
-    if (nouveauProduit == NULL) return NULL; // l'allocation m�moire n'a pas pu se faire
+    if (nouveauProduit == NULL) return NULL; // l'allocation mémoire n'a pas pu se faire
 
 
-    nouveauProduit->designation = malloc(strlen(designation) + 1); // Important : malloc permet d'avoir l'espace m�moire d�di� pour notre champ de structure
+    nouveauProduit->designation = malloc(strlen(designation) + 1); // Important : malloc permet d'avoir l'espace mémoire dédié pour notre champ de structure
     strcpy(nouveauProduit->designation,designation);
     nouveauProduit->prix = prix;
     nouveauProduit->quantite_en_stock = quantite;
@@ -178,7 +106,7 @@ T_Produit *creerProduit(char *designation, float prix, int quantite) {
 
 
 /* ********************************
- * Cr�ation et initialisation Rayon
+ * Création et initialisation Rayon
  ******************************** */
 T_Rayon *creerRayon(char *nom) {
     T_Rayon *nouveauRayon = NULL;
@@ -198,7 +126,7 @@ T_Rayon *creerRayon(char *nom) {
 
 
 /* **********************************
- * Cr�ation et initialisation Magasin
+ * Création et initialisation Magasin
  ********************************** */
 T_Magasin *creerMagasin(char *nom) {
     T_Magasin *nouveauMagasin = NULL;
@@ -214,16 +142,14 @@ T_Magasin *creerMagasin(char *nom) {
 }
 
 
-/* **************************************************
- * Alerte pour les fonctions de r�cup�ration de rayon
- ************************************************** */
+/* *********************************************************************************
+ * Vérification de la présence / récuparation de rayons au sein du magasin
+ ******************************************************************************** */
 void alert_DeptDoesNotExists(char *nomRayonRecherche) {
     printf("\nLe rayon %s n'existe pas ! ", nomRayonRecherche);
 }
 
-/* ***************************************************************
- * R�cup�re le T_Rayon correspondant au nom pass� en param�tre
- ************************************************************** */
+// Récupère le T_Rayon correspondant au nom passé en paramètre
 T_Rayon *getDeptByName(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
     T_Rayon *rayonCourant = magasin->liste_rayons;
 
@@ -238,12 +164,9 @@ T_Rayon *getDeptByName(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) 
     return NULL;
 }
 
-
-/* ***************************************************************
- * V�rifie si, au sein du magasin, le rayon pass� en param existe
- ************************************************************** */
+// Vérifie si, au sein du magasin, le rayon passé en param existe
 bool isDeptSet(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
-    if(! isAnyDeptSet(magasin, shouldWarnUser)) return false;   // Juste au cas o�, on v�rifie qu'au moins un rayon soit bien d�fini.
+    if(! isAnyDeptSet(magasin, shouldWarnUser)) return false;   // Juste au cas oé, on vérifie qu'au moins un rayon soit bien défini.
 
     T_Rayon *rayon = getDeptByName(magasin, nomRayon, false);
     if(rayon != NULL) return true;
@@ -257,26 +180,24 @@ bool isDeptSet(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
  * Ajout d'un rayon dans un magasin
  ******************************** */
 int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
-    // TODO : Attention � bien v�rifier toutes les valeurs que peut prendre "magasin"
-
     T_Rayon *rayonPrecedent = NULL;
     T_Rayon *rayonCourant = magasin->liste_rayons;
 
-    // On parcourt toute la liste jusqu'� trouver un mot plus grand ou la fin de la liste
+    // On parcourt toute la liste jusqu'à trouver un mot plus grand ou la fin de la liste
     while (rayonCourant != NULL && strcmp(rayonCourant->nom_rayon, nomRayon) < 0)
     {
         rayonPrecedent = rayonCourant;
         rayonCourant = rayonCourant->suivant;
     }
 
-    // Test si rayon existe d�j�
+    // Test si rayon existe déjé
     if (rayonCourant != NULL && strcmp(rayonCourant->nom_rayon, nomRayon) == 0)
     {
         printf("Le rayon %s existe déjà.\n", nomRayon);
         return 0;
     }
 
-    // Ok pour ins�rer 
+    // Ok pour insérer 
 
     T_Rayon *nouveauRayon = creerRayon(nomRayon);
 
@@ -302,24 +223,24 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
         return 0;
     }
 
-    //* V�rification si le produit existe d�j� dans le rayon
+    //* Vérification si le produit existe déjé dans le rayon
     T_Produit *produit = rayon->liste_produits;
     while (produit != NULL) {
         if (strcmp(produit->designation, designation) == 0) {
 
-            // Le produit existe d�j�, on augmente simplement sa quantite et demande si prix modifie ou pas
-            printf("Un produit avec le m�me nom existe d�j�.\n");
-            printf("Vouz aurez le choix entre augmenter sa quantit� et/ou modifier son prix si vous avez rentr� un prix diff�rent de l'ancien.\n");
-            printf("Si vous souhaitez le remplacer avec la nouvelle quantit� et prix, supprimez-le et cr�ez-en un nouveau.\n");
+            // Le produit existe déjé, on augmente simplement sa quantite et demande si prix modifie ou pas
+            printf("Un produit avec le méme nom existe déjé.\n");
+            printf("Vouz aurez le choix entre augmenter sa quantité et/ou modifier son prix si vous avez rentré un prix différent de l'ancien.\n");
+            printf("Si vous souhaitez le remplacer avec la nouvelle quantité et prix, supprimez-le et créez-en un nouveau.\n");
 
             char reponse = 'n'; // Intialisation
             do
             {
                 if(reponse != 'o' && reponse != 'n') 
                 {
-                    printf("\nERREUR : seulement 'o' et 'n' sont accept�s en r�ponse ! ");
+                    printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse ! ");
                 }
-                printf("\nVoulez-vous augmenter sa quantit� ? (o/n) ");
+                printf("\nVoulez-vous augmenter sa quantité ? (o/n) ");
                 reponse = getchar();
                 viderBuffer();
             } while (reponse != 'o' && reponse != 'n'); 
@@ -334,14 +255,14 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
                     {
                         if(reponse != 'o' && reponse != 'n') 
                         {
-                            printf("\nERREUR : seulement 'o' et 'n' sont accept�s en r�ponse !\n ");
+                            printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse !\n ");
                         }
                         printf("Souhaitez-vous modifier son prix (o/n) ? Ancien prix: %f\n", produit->prix);
                         reponse = getchar();
                         viderBuffer();
                     } while (reponse != 'o' && reponse != 'n');
 
-                    if (reponse == 'o') // On supprime le produit et insere avec qt� augment�e et prix diff�rent pour avoix la liste encore tri�e
+                    if (reponse == 'o') // On supprime le produit et insere avec qté augmentée et prix différent pour avoix la liste encore triée
                     {   
                         int stockancien = produit->quantite_en_stock;
                         int testsupprim, testajout;
@@ -379,7 +300,7 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
     }
 
 
-    //* Cr�ation du nouveau produit
+    //* Création du nouveau produit
     T_Produit *nouveauProduit = creerProduit(designation, prix, quantite);
 
 
@@ -387,13 +308,13 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
     T_Produit *produitPrecedent = NULL;
     T_Produit *produitCourant = rayon->liste_produits;
 
-    // tant qu'on trouve un prix inf�rieur au produit courant, on avance dans le rayon 
+    // tant qu'on trouve un prix inférieur au produit courant, on avance dans le rayon 
     while (produitCourant != NULL && produitCourant->prix < prix) {
         produitPrecedent = produitCourant;
         produitCourant = produitCourant->suivant;
     }
 
-    // On vient de d�passer le dernier produit au prix < au prix courant. On ins�re 
+    // On vient de dépasser le dernier produit au prix < au prix courant. On insére 
     if(produitPrecedent == NULL)
     {
         nouveauProduit->suivant = rayon->liste_produits;
@@ -404,7 +325,7 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
 
     nouveauProduit->suivant = produitCourant; // Pour bien marquer la fin
 
-    return 1; // Succ�s de l'ajout
+    return 1; // Succés de l'ajout
 }
 
 
@@ -415,7 +336,7 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
  ********************************************* */
 void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float prix, int quantite, char *nom_rayon) {
 
-    // Si la liste est vide, c��d designation = "-1" on ajoute directement le produit
+    // Si la liste est vide, cééd designation = "-1" on ajoute directement le produit
     if (strcmp((*rayontemp)->designation, "-1") == 0) {
     (*rayontemp)->designation = malloc(strlen(designation) + 1);
     strcpy((*rayontemp)->designation, designation);
@@ -427,7 +348,7 @@ void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float
     return;
     }
 
-    // Sinon tant qu'on trouve un prix inf�rieur au produit courant, on avance dans le rayon 
+    // Sinon tant qu'on trouve un prix inférieur au produit courant, on avance dans le rayon 
     T_Rayon_Temp *current = *rayontemp;
     T_Rayon_Temp *precedent = NULL;
     while (current != NULL && current->prix < prix) {
@@ -435,7 +356,7 @@ void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float
         current = current->suivant;
     }
 
-    // On cr�e un nouveau produit �� ins�rer
+    // On crée un nouveau produit éé insérer
     T_Rayon_Temp *nouveau = malloc(sizeof(T_Rayon_Temp));
     nouveau->designation = malloc(strlen(designation) + 1);
     strcpy(nouveau->designation, designation);
@@ -445,7 +366,7 @@ void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float
     strcpy(nouveau->rayon, nom_rayon);
     nouveau->suivant = NULL;
 
-    if (precedent == NULL) { // Si insertion en t�te
+    if (precedent == NULL) { // Si insertion en téte
         nouveau->suivant = *rayontemp;
         *rayontemp = nouveau;
     }
@@ -460,7 +381,7 @@ void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float
 
 
 /* *****************************************
- * R�cup�ration du nom de rayon le plus long
+ * Récupération du nom de rayon le plus long
  ***************************************** */
 char *getLongestDeptName(T_Magasin *magasin) {
     T_Rayon *rayons;
@@ -501,15 +422,15 @@ int compterProduits(T_Rayon *rayon) {
 }
 
 /* *****************************************************
- * afficher caract�re de s�paration d'un tableau affich�
+ * afficher caractére de séparation d'un tableau affiché
  **************************************************** */
 char * getRepeatedChar(int nbCaracteres, char separateur) {
     if(nbCaracteres <= 0) return "";
-    // Allouer de la m�moire pour la cha�ne de caract�res
+    // Allouer de la mémoire pour la chaéne de caractéres
     char *resultat = (char *) malloc(nbCaracteres + 1);
     if (resultat == NULL) return NULL;
 
-    // Initialiser la cha�ne de caract�res avec le caract�re s�parateur r�p�t� nbCaracteres fois
+    // Initialiser la chaéne de caractéres avec le caractére séparateur répété nbCaracteres fois
     memset(resultat, separateur, nbCaracteres);
 
     resultat[nbCaracteres] = '\0';
@@ -523,6 +444,8 @@ char * getSeparationLine(int nbCaracteres) {
 
 /* **********************
  * Affichage d'un tableau
+ * ATTENTION : Le tableau inséré doit être terminé par NULL ainsi que chacun de ses sous tableaux
+ * EXEMPLE : char ***tableaux[] = {  {"Toto", NULL}, NULL } // tableau d'une colonne vide nommée "Toto"
  ********************** */
 void afficherTableau(char ***tableaux) {
     int i, j, k;
@@ -532,13 +455,14 @@ void afficherTableau(char ***tableaux) {
     //* Calcul des dimensions
     int nb_colonnes = 0;
     int nb_rangees = 0;
-    int nbMax_lignes = 0;
+    int nbMax_rangees = 0;
 
     // Calcul nombre de colonnes
     while (tableaux[nb_colonnes] != NULL) {
         nb_colonnes++;
     }
 
+    if(nb_colonnes == 0) return; // aucun tableau (colonnes) inséré dans tableaux[] | EX : tableaux == {NULL}
 
     // Calcul le nombre de rangées du tableau + largeur des colonnes
     int largeur_colonne[nb_colonnes];
@@ -555,12 +479,12 @@ void afficherTableau(char ***tableaux) {
             nb_rangees++;
         }
 
-        if (nb_rangees > nbMax_lignes) nbMax_lignes = nb_rangees;
+        if (nb_rangees > nbMax_rangees) nbMax_rangees = nb_rangees;
         hauteur_colonnes[i] = nb_rangees;
     }
 
+    if(nbMax_rangees == 0) return; // Les tableaux insérés dans tableaux[] sont vides | EX : tableaux == {{NULL}, {NULL}, {NULL}}
     
-
 
     //* Affichage du tableau
     // Affichage de la première ligne
@@ -592,7 +516,7 @@ void afficherTableau(char ***tableaux) {
     printf("\n");
 
     // Affichage du contenu de la colonne
-    for (i = 0; i < nbMax_lignes - 1; i++) {
+    for (i = 0; i < nbMax_rangees - 1; i++) {
         printf("|");
         for (j = 0; j < nb_colonnes; j++) {
 
@@ -735,7 +659,7 @@ void afficherRayon(T_Rayon *rayon) {
 
 
 /* ******************************
- * V�rifie si le magasin existe
+ * Vérifie si le magasin existe
  ****************************** */
 bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
     bool isStoreSet = (bool) magasin;
@@ -750,10 +674,10 @@ bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
 
 
 /* *********************************************************
- * V�rifie si, au sein du magasin, au moins un rayon existe
+ * Vérifie si, au sein du magasin, au moins un rayon existe
  ******************************************************** */
 bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser) {
-    if(! isStoreSet(magasin, shouldWarnUser)) return false; // Juste au cas o�, on v�rifie que le magasin soit bien d�fini.
+    if(! isStoreSet(magasin, shouldWarnUser)) return false; // Juste au cas oé, on vérifie que le magasin soit bien défini.
                                                             // Si pas de magasin => pas de rayon
 
     if(magasin->liste_rayons == NULL) {
@@ -773,7 +697,7 @@ int supprimerProduit(T_Rayon *rayon, char* designation_produit) {
     T_Produit *produitprecedent = NULL;
     T_Produit *produitcurrent = rayon->liste_produits;
 
-    // Si le produit est au d�but
+    // Si le produit est au début
     if (produitcurrent != NULL && strcmp(produitcurrent->designation, designation_produit) == 0)
     {
         rayon->liste_produits = produitcurrent->suivant;
@@ -809,7 +733,7 @@ int supprimerRayon(T_Magasin *magasin, char *nom_rayon) {
     T_Rayon *rayonprecedent = NULL;
     T_Produit *produitcurrent = NULL;
 
-    // Si le rayon est au d�but
+    // Si le rayon est au début
     if (rayonCourant != NULL && strcmp(rayonCourant->nom_rayon, nom_rayon) == 0)
     {
         magasin->liste_rayons = rayonCourant->suivant;
@@ -855,13 +779,13 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
     T_Rayon *rayon_current = magasin->liste_rayons;
     T_Produit *produit_current;
 
-    T_Rayon_Temp *rayontemp = NULL; // T�te de la liste �� afficher
+    T_Rayon_Temp *rayontemp = NULL; // Téte de la liste éé afficher
     rayontemp = malloc(sizeof(T_Rayon_Temp));
-    rayontemp->designation = malloc(strlen("-1") + 1); // On initialise �� -1 pour savoir s'il est vide ou pas
+    rayontemp->designation = malloc(strlen("-1") + 1); // On initialise éé -1 pour savoir s'il est vide ou pas
     strcpy(rayontemp->designation, "-1");
     rayontemp->suivant = NULL;
 
-    // On initialise celui que l'on va it�rer, pour conserver le d�but dans rayontemp
+    // On initialise celui que l'on va itérer, pour conserver le début dans rayontemp
     T_Rayon_Temp *produitsTemp = NULL;
     produitsTemp = malloc(sizeof(T_Rayon_Temp));
     produitsTemp->suivant = NULL;
@@ -897,7 +821,7 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
 
     int produitCourant          = 0;
 
-    produitsTemp = rayontemp; // On revient dans la t�te. On utilise current pour ne pas perdre la t�te pour free la m�moire apr�s
+    produitsTemp = rayontemp; // On revient dans la téte. On utilise current pour ne pas perdre la téte pour free la mémoire aprés
 
     while (produitsTemp != NULL)
     {
@@ -931,7 +855,7 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
     afficherTableau(tableaux);
 
 
-    // On lib�re la m�moire du rayon temporaire cr��
+    // On libére la mémoire du rayon temporaire créé
     produitsTemp = rayontemp;
     while (produitsTemp != NULL)
     {   
@@ -964,20 +888,20 @@ void fusionnerRayons(T_Magasin *magasin) {
         return;
     }
 
-    // Identification des rayons �� fusionner
+    // Identification des rayons éé fusionner
     T_Rayon *rayon_1 = getDeptByName(magasin, nom_rayon_1, true);
     T_Rayon *rayon_2 = getDeptByName(magasin, nom_rayon_2, true);
     
     T_Produit *prayon_1 = rayon_1->liste_produits;
     T_Produit *prayon_2 = rayon_2->liste_produits;
 
-    // Ca va nous permettre de cr�er le nouveau rayon avec le m�me nom de ceux pr�c�dents
-    // On remplace leur nom. De toute fa�on on les supprime apr�s
+    // Ca va nous permettre de créer le nouveau rayon avec le méme nom de ceux précédents
+    // On remplace leur nom. De toute faéon on les supprime aprés
 
     strcpy(rayon_1->nom_rayon, "x");
     strcpy(rayon_2->nom_rayon, "xx");
 
-    // Cr�ation et identification du nouveau rayon
+    // Création et identification du nouveau rayon
     ajouterRayon(magasin, nom_resultant);
     T_Rayon *rayon_resultant = getDeptByName(magasin, nom_resultant, true);
 
@@ -991,7 +915,7 @@ void fusionnerRayons(T_Magasin *magasin) {
     {
         if (prayon_1 == NULL && prayon_2 == NULL)
         {
-            // on ne fait rien; �� la fin on supprime les 2 rayons et on laisse juste le nouveau
+            // on ne fait rien; éé la fin on supprime les 2 rayons et on laisse juste le nouveau
         }
 
         else if (prayon_1 != NULL && prayon_2 == NULL)
@@ -1007,7 +931,7 @@ void fusionnerRayons(T_Magasin *magasin) {
 
     else 
     {
-        // Marquer le d�but du rayon avec le produit le moins cher
+        // Marquer le début du rayon avec le produit le moins cher
         if (prayon_1->prix >= prayon_2->prix)
         {
             rayon_resultant->liste_produits = prayon_2;
@@ -1052,7 +976,7 @@ void fusionnerRayons(T_Magasin *magasin) {
 
     // Dans TOUS LES CAS:
     // On supprime ces rayons
-    // Ils vont quand m�me pointer sur le premier produit, on met NULL pour pas supprimer les produits avec
+    // Ils vont quand méme pointer sur le premier produit, on met NULL pour pas supprimer les produits avec
     rayon_1->liste_produits = NULL;
     rayon_2->liste_produits = NULL;
 

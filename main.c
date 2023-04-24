@@ -5,19 +5,8 @@
 #include "tp3.h"
 #include "tp3.c"
 
-
 int main(void)
-{ 
-
-    // char *tableau1[] = {"Nom", "Alice", "Bob", "Charlie", NULL};
-    // char *tableau2[] = {"Age", "25", "30", "35", NULL};
-    // char *tableau3[] = {"Profession", "Ing‚nieur", "M‚decin", "Avocat", "Vendeur", NULL};
-    // char *tableau4[] = {"Ville", "Tokyo", NULL};
-    // char *tableau5[] = {"Ville", "Tokyo", NULL};
-    // char *tableau6[] = {"Ville", "Tokyo", NULL};
-    // char **tableaux[] = {tableau1, tableau2, tableau3, tableau4, tableau5, tableau6, NULL};
-    // afficherTableau(tableaux);
-
+{
     
     T_Magasin *mon_magasin = NULL;
 
@@ -39,30 +28,29 @@ int main(void)
         printf("\n======================================");
         printf("\n   Votre choix ? ");
         choix = getchar();
-        viderBuffer(); // supprimer de l'entr?e standard le retour charriot et les ?ventuels caract?res suppl?mentaires tap?s par l'utilisateur
+        viderBuffer(); // suppression de l'entr?e standard le retour charriot et les ?ventuels caract?res suppl?mentaires tap?s par l'utilisateur
 
-        printf("\nChoix %c sÃ©lectionnÃ© \n", choix);
+        printf("\nChoix %c s‚lectionn‚ \n", choix);
 
 
         
-        char *choixNecessitantMagDefini     = "2345678";    // la liste des choix nÃ©cessitant de vÃ©rifier si mon_magasin a Ã©tÃ© initialisÃ©
-        char *choixNecessitantUnRayonDefini = "345678";     // La liste des choix nÃ©cessitant de vÃ©rifier si au moins un rayon a Ã©tÃ© initialisÃ©.
-                                                            //  choixNecessitantUnRayonDefini est composÃ© d'une partie des choixNecessitantMagDefini
+        char *choixNecessitantMagDefini     = "2";           // la liste des choix n‚cessitant de v‚rifier (seulement) si mon_magasin a ‚t‚ initialis‚
+        char *choixNecessitantUnRayonDefini =  "3456789";    // La liste des choix n‚cessitant de v‚rifier si au moins un rayon a ‚t‚ initialis‚.
+                                                             // (NB : Si aucun magasin n'est d‚fini, alors isAnyDeptSet() l'indiquera de toute faÃ§on dans la console)
 
-        // TODO : dans l'idÃ©al, il faudrait virer cette partie pour intÃ©grer les tests directement dans les fonctions
-        // Pour Ã©viter la redondance de isStoreSet & isAnyDeptSet dans le switch
+        // Pour ‚viter la redondance de isStoreSet() & isAnyDeptSet() dans le switch on pr‚-conditionne
+        // (Permet d'afficher des messages d'erreur pr‚cis Ã  l'utilisateur)
         if (isCharInArray(choix, choixNecessitantMagDefini)){ 
             // Si aucun magasin n'existe pour les choixNecessitantMagDefini
             if(! isStoreSet(mon_magasin, true)) {
                 continue;
             }
-            
-            // Si un magasin existe pour les choixNecessitantUnRayonDefini...
-            if (isCharInArray(choix, choixNecessitantUnRayonDefini)) {
-                // ... mais qu'aucun rayon n'existe
-                if(! isAnyDeptSet(mon_magasin, true)) {
-                    continue;
-                }
+        }
+
+        if (isCharInArray(choix, choixNecessitantUnRayonDefini)) {
+            // Si aucun rayon n'existe pour les choixNecessitantUnRayonDefini
+            if(! isAnyDeptSet(mon_magasin, true)) {
+                continue;
             }
         }
 
@@ -71,16 +59,16 @@ int main(void)
                 printf("\n======== PROGRAMME TERMINE ========\n");
                 break;
 
-            case '1' : // CrÃ©er magasin
+            case '1' : // Cr‚er magasin
 
-                if(isStoreSet(mon_magasin, false)) { // Si le magasin existe dÃ©jÃ©
-                    printf("\nUn magasin existe dÃ©jÃ© ! ");
+                if(isStoreSet(mon_magasin, false)) { // Si le magasin existe d‚j…, on propose de le remplacer (destruction + cr‚ation nouveau)
+                    printf("\nUn magasin existe d‚j… ! ");
     
-                    char reponse = 'n'; // Intialisation
+                    char reponse = 'n'; // Intialisation pour le do-while
                     do
                     {
                         if(reponse != 'o' && reponse != 'n') {
-                            printf("\nERREUR : seulement 'o' et 'n' sont acceptÃ©s en rÃ©ponse ! ");
+                            printf("\nERREUR : seulement 'o' et 'n' sont accept‚s en r‚ponse ! ");
                         }
 
                         printf("\nVoulez-vous le remplacer ? (o/n) ");
@@ -103,21 +91,20 @@ int main(void)
 
             case '2' : // Ajouter rayon
             {
-                // RÃ©cupÃ©ration de l'input
-                    char *nomRayon = getStringInput("\nNom du rayon ? ");
+                // R‚cup‚ration de l'input
+                char *nomRayon = getStringInput("\nNom du rayon ? ");
 
-                    // CrÃ©ation
-                    ajouterRayon(mon_magasin, nomRayon);
+                // Cr‚ation
+                ajouterRayon(mon_magasin, nomRayon);
 
-                    free(nomRayon);
-                    break;
+                free(nomRayon);
+                break;
             }
-
             case '3' : // Ajouter produit
             {
                 afficherRayons(mon_magasin);
 
-                // rÃ©cupÃ©ration de l'input
+                // r‚cup‚ration de l'input
                 char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
 
                 if(!getDeptByName(mon_magasin, nomRayonRecherche, true)) { 
@@ -130,7 +117,7 @@ int main(void)
                 int quantite = getIntInput("\nQuantit‚ du produit ? ");
 
 
-                //crÃ©ation
+                //cr‚ation
                 T_Rayon *rayonCourant = mon_magasin->liste_rayons;
                 while (rayonCourant != NULL)
                 {   
@@ -146,7 +133,7 @@ int main(void)
 
                 break;
             }
-            case '4' : // Afficher rayons
+            case '4' : // Afficher rayons du magasin
             {
                 afficherMagasin(mon_magasin);
 
@@ -157,7 +144,7 @@ int main(void)
                 // Rappel des noms des rayons
                 afficherRayons(mon_magasin);
 
-                char *nomRayonRecherche = getStringInput("\nNom du rayon Ã  dÃ©tailler ? ");
+                char *nomRayonRecherche = getStringInput("\nNom du rayon Ã  d‚tailler ? ");
 
 
                 T_Rayon *rayonRecherche = getDeptByName(mon_magasin, nomRayonRecherche, true);
@@ -231,8 +218,6 @@ int main(void)
                 printf("\n\nERREUR : votre choix n'est pas valide ! ");
             }
             printf("\n\n\n");
-
-            // clear_screen();
         }
 
         return 0;

@@ -80,13 +80,9 @@ bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser);
 // UTILS
     // proc
 void viderBuffer();
-void clear_screen();
 void replaceNewLine_WithNullTerminator(char *string);
 
     // func
-int getNumLength(int num);
-int getFloatNumLength(float num);
-// char *getXInput(char *prompt, enum getInputTypes type, char *args);
 char *getStringInput(char *prompt);
 float getFloatInput(char *prompt);
 int getIntInput(char *prompt);
