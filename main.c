@@ -36,20 +36,20 @@ int main(void)
         
         char *choixNecessitantMagDefini     = "2";           // la liste des choix n‚cessitant de v‚rifier (seulement) si mon_magasin a ‚t‚ initialis‚
         char *choixNecessitantUnRayonDefini =  "3456789";    // La liste des choix n‚cessitant de v‚rifier si au moins un rayon a ‚t‚ initialis‚.
-                                                             // (NB : Si aucun magasin n'est d‚fini, alors isAnyDeptSet() l'indiquera de toute faÃ§on dans la console)
+                                                             // (NB : Si aucun magasin n'est d‚fini, alors isAnyRayonSet() l'indiquera de toute faÃ§on dans la console)
 
-        // Pour ‚viter la redondance de isStoreSet() & isAnyDeptSet() dans le switch on pr‚-conditionne
+        // Pour ‚viter la redondance de isMagasinSet() & isAnyRayonSet() dans le switch on pr‚-conditionne
         // (Permet d'afficher des messages d'erreur pr‚cis Ã  l'utilisateur)
         if (isCharInArray(choix, choixNecessitantMagDefini)){ 
             // Si aucun magasin n'existe pour les choixNecessitantMagDefini
-            if(! isStoreSet(mon_magasin, true)) {
+            if(! isMagasinSet(mon_magasin, true)) {
                 continue;
             }
         }
 
         if (isCharInArray(choix, choixNecessitantUnRayonDefini)) {
             // Si aucun rayon n'existe pour les choixNecessitantUnRayonDefini
-            if(! isAnyDeptSet(mon_magasin, true)) {
+            if(! isAnyRayonSet(mon_magasin, true)) {
                 continue;
             }
         }
@@ -61,7 +61,7 @@ int main(void)
 
             case '1' : // Cr‚er magasin
 
-                if(isStoreSet(mon_magasin, false)) { // Si le magasin existe d‚j…, on propose de le remplacer (destruction + cr‚ation nouveau)
+                if(isMagasinSet(mon_magasin, false)) { // Si le magasin existe d‚j…, on propose de le remplacer (destruction + cr‚ation nouveau)
                     printf("\nUn magasin existe d‚j… ! ");
     
                     char reponse = 'n'; // Intialisation pour le do-while
@@ -107,7 +107,7 @@ int main(void)
                 // r‚cup‚ration de l'input
                 char *nomRayonRecherche = getStringInput("\nNom du rayon ? ");
 
-                if(!getDeptByName(mon_magasin, nomRayonRecherche, true)) { 
+                if(!getRayonParNom(mon_magasin, nomRayonRecherche, true)) { 
                     printf("Merci de r‚essayer avec un rayon existant.");
                     break; 
                 }
@@ -144,10 +144,10 @@ int main(void)
                 // Rappel des noms des rayons
                 afficherRayons(mon_magasin);
 
-                char *nomRayonRecherche = getStringInput("\nNom du rayon Ã  d‚tailler ? ");
+                char *nomRayonRecherche = getStringInput("\nNom du rayon … d‚tailler ? ");
 
 
-                T_Rayon *rayonRecherche = getDeptByName(mon_magasin, nomRayonRecherche, true);
+                T_Rayon *rayonRecherche = getRayonParNom(mon_magasin, nomRayonRecherche, true);
                 free(nomRayonRecherche);
 
                 if(rayonRecherche != NULL) afficherRayon(rayonRecherche);
@@ -159,7 +159,7 @@ int main(void)
                 afficherRayons(mon_magasin);
                 char *nomRayonDuProduitASupprimer = getStringInput("\nNom du rayon ? ");
 
-                T_Rayon *rayonDuProduitASupprimer = getDeptByName(mon_magasin, nomRayonDuProduitASupprimer, true);
+                T_Rayon *rayonDuProduitASupprimer = getRayonParNom(mon_magasin, nomRayonDuProduitASupprimer, true);
 
                 if(! rayonDuProduitASupprimer ) { 
                     printf("Merci de r‚essayer avec un rayon existant.");
@@ -176,7 +176,7 @@ int main(void)
                 char *nomProduitASupprimer = getStringInput("\nNom du produit ? ");
 
                 if (isDeptSet(mon_magasin, nomRayonDuProduitASupprimer, true)){
-                    T_Rayon *rayons = getDeptByName(mon_magasin, nomRayonDuProduitASupprimer, true);
+                    T_Rayon *rayons = getRayonParNom(mon_magasin, nomRayonDuProduitASupprimer, true);
                     supprimerProduit(rayons, nomProduitASupprimer);
                 }
 
@@ -208,7 +208,7 @@ int main(void)
             {
                 afficherRayons(mon_magasin);
 
-                if (isAnyDeptSet(mon_magasin, true)){
+                if (isAnyRayonSet(mon_magasin, true)){
                     fusionnerRayons(mon_magasin);
                 }
 

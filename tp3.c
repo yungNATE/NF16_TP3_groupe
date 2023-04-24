@@ -8,27 +8,12 @@
 /* *********************
  * Fonctions utilitaires
  ********************* */
-// Vider le buffer (utile quand on utilise des getchar() )
-void viderBuffer() {
-    int c = 0;
-    while (c != '\n' && c != EOF) {
-        c = getchar();
-    }
-}
-
-// remplace "\n" par "\0" dans un string
-void replaceNewLine_WithNullTerminator(char *str) {
-    str[strcspn(str, "\n")] = '\0';
-}
-
-// Les fonctions getTypeInput() permettent de s'assurer qu'on input bien le type recherché
 char *getStringInput(char *prompt){
     printf("%s", prompt);
 
     char *input = malloc(sizeof(char) * 100);
     fgets(input, 100, stdin);
     replaceNewLine_WithNullTerminator(input);
-    fflush(stdin); // TODO : vérifier si utile
     
     return input;
 }
@@ -67,7 +52,15 @@ int getIntInput(char *prompt){
     return prix;
 }
 
-// Test la présence d'un char au sein d'un tableau
+void viderBuffer() {
+    int c = 0;
+    while (c != '\n' && c != EOF) {
+        c = getchar();
+    }
+}
+void replaceNewLine_WithNullTerminator(char *str) {
+    str[strcspn(str, "\n")] = '\0';
+}
 bool isCharInArray(char c, char *array) {
     int i = 0;
     while (array[i] != '\0') {
@@ -78,6 +71,118 @@ bool isCharInArray(char c, char *array) {
     }
     return false;
 }
+char *getCaractereRepete(int nbCaracteres, char car) {
+    if(nbCaracteres <= 0) return "";
+    // Allouer de la mémoire pour la chaéne de caractéres
+    char *resultat = (char *) malloc(nbCaracteres + 1);
+    if (resultat == NULL) return NULL;
+
+    // Initialiser la chaéne de caractéres avec le caractére séparateur répété nbCaracteres fois
+    memset(resultat, car, nbCaracteres);
+
+    resultat[nbCaracteres] = '\0';
+
+    return resultat;
+}
+void afficherTableau(char ***tableaux) {
+    // ATTENTION : Le tableau inséré doit être terminé par NULL ainsi que chacun de ses sous tableaux
+    // EXEMPLE : char ***tableaux[] = {  {"Toto", NULL}, NULL } // tableau d'une colonne vide nommée "Toto"
+    int i, j, k;
+
+    //* Calcul des dimensions
+    int nb_colonnes = 0;
+    int nb_rangees = 0;
+    int nbMax_rangees = 0;
+
+    // Calcul nombre de colonnes
+    while (tableaux[nb_colonnes] != NULL) {
+        nb_colonnes++;
+    }
+
+    if(nb_colonnes == 0) return; // aucun tableau (colonnes) inséré dans tableaux[] | EX : tableaux == {NULL}
+
+    // Calcul le nombre de rangées du tableau + largeur des colonnes
+    int largeur_colonne[nb_colonnes];
+    int largeur_totale_colonnes = 0;
+    int hauteur_colonnes[nb_colonnes];
+
+    for (i = 0; i < nb_colonnes; i++) {
+        largeur_colonne[i] = 0;
+        nb_rangees = 0;
+
+        while (tableaux[i][nb_rangees] != NULL) {
+            largeur_totale_colonnes += strlen(tableaux[i][nb_rangees]) + 1;
+
+            if (strlen(tableaux[i][nb_rangees]) > largeur_colonne[i]) {
+                largeur_colonne[i] = strlen(tableaux[i][nb_rangees]);
+            }
+            nb_rangees++;
+        }
+
+        if (nb_rangees > nbMax_rangees) nbMax_rangees = nb_rangees;
+        hauteur_colonnes[i] = nb_rangees;
+    }
+
+    if(nbMax_rangees == 0) return; // Les tableaux insérés dans tableaux[] sont vides | EX : tableaux == {{NULL}, {NULL}, {NULL}}
+
+    //* Affichage du tableau
+    const char charLigne   = '-';
+    const char charCoin    = '+';
+    const char charColonne = '|';
+
+    // construction des lignes de séparation
+    char* ligne = malloc((largeur_totale_colonnes + 1) * sizeof(char));
+    if (ligne == NULL) {
+        printf("Erreur : impossible d'allouer de la mémoire.\n");
+        exit(1);
+    }
+    int pos = 0;
+    ligne[pos++] = charCoin;
+    for (i = 0; i < nb_colonnes; i++) {
+        pos += sprintf(&ligne[pos], "%s", getCaractereRepete(largeur_colonne[i] + 2, '-'));
+        ligne[pos++] = charCoin;
+    }
+    ligne[pos++] = '\n';
+    ligne[pos] = '\0';
+
+    // Affichage de la première ligne
+    printf("%s", ligne);
+
+    // Affichage des entêtes de colonne
+    printf("%c", charColonne);
+    for (i = 0; i < nb_colonnes; i++) {
+        printf(" %-*s |", largeur_colonne[i], tableaux[i][0]);
+        // comprendre %-*s : https://stackoverflow.com/questions/23776824/what-is-the-meaning-of-s-in-a-printf-format-string 
+    }
+    printf("\n");
+
+    // Affichage de la ligne de séparation
+    printf("%s", ligne);
+
+
+    // Affichage du contenu de la colonne
+    for (i = 0; i < nbMax_rangees - 1; i++) {
+        printf("%c", charColonne);
+        for (j = 0; j < nb_colonnes; j++) {
+
+            if( tableaux[j][i+1] == NULL || i >= hauteur_colonnes[j] ) { // si on sort des valeurs de la colonnes courante (AKA si on atteint ou dépasse NULL)
+                printf(" %-*s |", largeur_colonne[j], "");
+                continue;
+            } 
+
+            printf(" %-*s |", largeur_colonne[j], tableaux[j][i+1]);
+        }
+        printf("\n");
+    }
+
+    // Affichage de la dernière ligne
+    printf("%s", ligne);
+
+    free(ligne);
+
+    return;
+}
+
 
 
 /* **********************************
@@ -142,15 +247,14 @@ T_Magasin *creerMagasin(char *nom) {
 }
 
 
+
 /* *********************************************************************************
  * Vérification de la présence / récuparation de rayons au sein du magasin
  ******************************************************************************** */
-void alert_DeptDoesNotExists(char *nomRayonRecherche) {
+void alert_leRayonNExistePas(char *nomRayonRecherche) {
     printf("\nLe rayon %s n'existe pas ! ", nomRayonRecherche);
 }
-
-// Récupère le T_Rayon correspondant au nom passé en paramètre
-T_Rayon *getDeptByName(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
+T_Rayon *getRayonParNom(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
     T_Rayon *rayonCourant = magasin->liste_rayons;
 
 
@@ -160,20 +264,19 @@ T_Rayon *getDeptByName(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) 
     }
     printf("\n");
 
-    if(shouldWarnUser) alert_DeptDoesNotExists(nomRayon);
+    if(shouldWarnUser) alert_leRayonNExistePas(nomRayon);
     return NULL;
 }
-
-// Vérifie si, au sein du magasin, le rayon passé en param existe
 bool isDeptSet(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
-    if(! isAnyDeptSet(magasin, shouldWarnUser)) return false;   // Juste au cas oé, on vérifie qu'au moins un rayon soit bien défini.
+    if(! isAnyRayonSet(magasin, shouldWarnUser)) return false;   // Juste au cas oé, on vérifie qu'au moins un rayon soit bien défini.
 
-    T_Rayon *rayon = getDeptByName(magasin, nomRayon, false);
+    T_Rayon *rayon = getRayonParNom(magasin, nomRayon, false);
     if(rayon != NULL) return true;
 
-    if(shouldWarnUser) alert_DeptDoesNotExists(nomRayon);
+    if(shouldWarnUser) alert_leRayonNExistePas(nomRayon);
     return false;
 }
+
 
 
 /* ********************************
@@ -330,13 +433,12 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
 
 
 
-
 /* **********************************************
  * Ajout produit dans la nouvelle structure rayon
  ********************************************* */
 void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float prix, int quantite, char *nom_rayon) {
 
-    // Si la liste est vide, cééd designation = "-1" on ajoute directement le produit
+    // Si la liste est vide, càd designation = "-1" on ajoute directement le produit
     if (strcmp((*rayontemp)->designation, "-1") == 0) {
     (*rayontemp)->designation = malloc(strlen(designation) + 1);
     strcpy((*rayontemp)->designation, designation);
@@ -356,7 +458,7 @@ void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float
         current = current->suivant;
     }
 
-    // On crée un nouveau produit éé insérer
+    // On crée un nouveau produit à insérer
     T_Rayon_Temp *nouveau = malloc(sizeof(T_Rayon_Temp));
     nouveau->designation = malloc(strlen(designation) + 1);
     strcpy(nouveau->designation, designation);
@@ -379,178 +481,11 @@ void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float
 
 
 
-
-/* *****************************************
- * Récupération du nom de rayon le plus long
- ***************************************** */
-char *getLongestDeptName(T_Magasin *magasin) {
-    T_Rayon *rayons;
-    rayons = magasin->liste_rayons;
-
-    char *longestDeptName = NULL;
-    int max = 0, currentRayonLength = 0;
-    while (rayons != NULL)
-    {   
-        currentRayonLength = strlen(rayons->nom_rayon);
-        if (currentRayonLength <= max) {
-            rayons = rayons->suivant;
-            continue;
-        }
-
-        max = currentRayonLength;
-        longestDeptName = malloc(max + 1);
-        strcpy(longestDeptName, rayons->nom_rayon);
-        rayons = rayons->suivant;
-    }
-
-    return longestDeptName;
-}
-
-
-/* *****************************************
- * Compter le nombre de produits d'un rayon
- ***************************************** */
-int compterProduits(T_Rayon *rayon) {
-    int nbProduits = 0;
-    T_Produit *produits = rayon->liste_produits;
-    while (produits != NULL) {
-        nbProduits++;
-        produits = produits->suivant;
-    }
-
-    return nbProduits;
-}
-
-/* *****************************************************
- * afficher caractére de séparation d'un tableau affiché
- **************************************************** */
-char * getRepeatedChar(int nbCaracteres, char separateur) {
-    if(nbCaracteres <= 0) return "";
-    // Allouer de la mémoire pour la chaéne de caractéres
-    char *resultat = (char *) malloc(nbCaracteres + 1);
-    if (resultat == NULL) return NULL;
-
-    // Initialiser la chaéne de caractéres avec le caractére séparateur répété nbCaracteres fois
-    memset(resultat, separateur, nbCaracteres);
-
-    resultat[nbCaracteres] = '\0';
-
-    return resultat;
-}
-char * getSeparationLine(int nbCaracteres) {
-    return getRepeatedChar(nbCaracteres, '-');
-}
-
-
-/* **********************
- * Affichage d'un tableau
- * ATTENTION : Le tableau inséré doit être terminé par NULL ainsi que chacun de ses sous tableaux
- * EXEMPLE : char ***tableaux[] = {  {"Toto", NULL}, NULL } // tableau d'une colonne vide nommée "Toto"
- ********************** */
-void afficherTableau(char ***tableaux) {
-    int i, j, k;
-
-    // TODO : que faire si entrée d'un tableau vide ?
-
-    //* Calcul des dimensions
-    int nb_colonnes = 0;
-    int nb_rangees = 0;
-    int nbMax_rangees = 0;
-
-    // Calcul nombre de colonnes
-    while (tableaux[nb_colonnes] != NULL) {
-        nb_colonnes++;
-    }
-
-    if(nb_colonnes == 0) return; // aucun tableau (colonnes) inséré dans tableaux[] | EX : tableaux == {NULL}
-
-    // Calcul le nombre de rangées du tableau + largeur des colonnes
-    int largeur_colonne[nb_colonnes];
-    int largeur_totale_colonnes = 0;
-    int hauteur_colonnes[nb_colonnes];
-
-    for (i = 0; i < nb_colonnes; i++) {
-        largeur_colonne[i] = 0;
-        nb_rangees = 0;
-
-        while (tableaux[i][nb_rangees] != NULL) {
-            largeur_totale_colonnes += strlen(tableaux[i][nb_rangees]);
-            if (strlen(tableaux[i][nb_rangees]) > largeur_colonne[i]) {
-                largeur_colonne[i] = strlen(tableaux[i][nb_rangees]);
-            }
-            nb_rangees++;
-        }
-
-        if (nb_rangees > nbMax_rangees) nbMax_rangees = nb_rangees;
-        hauteur_colonnes[i] = nb_rangees;
-    }
-
-    if(nbMax_rangees == 0) return; // Les tableaux insérés dans tableaux[] sont vides | EX : tableaux == {{NULL}, {NULL}, {NULL}}
-    
-
-    //* Affichage du tableau
-    const char charLigne   = '-';
-    const char charCoin    = '+';
-
-    // construction des lignes de séparation
-    char* ligne = malloc((largeur_totale_colonnes + 1) * sizeof(char));
-    if (ligne == NULL) {
-        printf("Erreur : impossible d'allouer de la mémoire.\n");
-        exit(1);
-    }
-    int pos = 0;
-    ligne[pos++] = charCoin;
-    for (i = 0; i < nb_colonnes; i++) {
-        pos += sprintf(&ligne[pos], "%s", getRepeatedChar(largeur_colonne[i] + 2, '-'));
-        ligne[pos++] = charCoin;
-    }
-    ligne[pos++] = '\n';
-    ligne[pos] = '\0';
-
-    // Affichage de la première ligne
-    printf("%s", ligne);
-
-    // Affichage des entêtes de colonne
-    printf("|");
-    for (i = 0; i < nb_colonnes; i++) {
-        printf(" %-*s |", largeur_colonne[i], tableaux[i][0]);
-        // comprendre %-*s : https://stackoverflow.com/questions/23776824/what-is-the-meaning-of-s-in-a-printf-format-string 
-    }
-    printf("\n");
-
-    // Affichage de la ligne de séparation
-    printf("%s", ligne);
-
-
-    // Affichage du contenu de la colonne
-    for (i = 0; i < nbMax_rangees - 1; i++) {
-        printf("|");
-        for (j = 0; j < nb_colonnes; j++) {
-
-            if( tableaux[j][i+1] == NULL || i >= hauteur_colonnes[j] ) { // si on sort des valeurs de la colonnes courante (AKA si on atteint ou dépasse NULL)
-                printf(" %-*s |", largeur_colonne[j], "");
-                continue;
-            } 
-
-            printf(" %-*s |", largeur_colonne[j], tableaux[j][i+1]);
-        }
-        printf("\n");
-    }
-
-    // Affichage de la dernière ligne
-    printf("%s", ligne);
-    printf("\n");
-
-    free(ligne);
-
-    return;
-}
-
 /* *****************************************
  * Affichage de tous les rayons d'un magasin
  ***************************************** */
 void afficherMagasinGenerique(T_Magasin *magasin, bool shouldShowNbProducts) {
-    if(! isAnyDeptSet(magasin, true)) return;
+    if(! isAnyRayonSet(magasin, true)) return;
 
     T_Rayon *rayons;
     rayons = magasin->liste_rayons;
@@ -562,7 +497,10 @@ void afficherMagasinGenerique(T_Magasin *magasin, bool shouldShowNbProducts) {
 
     // Récupérer le nom des rayons ainsi que le nombre de produits dans chaque rayon
     char *nomRayons[99] = {"Rayons"};
-    char *nbProduitsParRayon[99] = {"Nombre produits"}; // TODO : inutile dans le cas du ! shouldShowNbProducts
+    char *nbProduitsStr;
+    char *nbProduitsParRayon[99];
+    if(shouldShowNbProducts) nbProduitsParRayon[0] = "Nombre produits";
+
     int rayonCourant = 0;
     while (rayons != NULL) {
 
@@ -579,7 +517,7 @@ void afficherMagasinGenerique(T_Magasin *magasin, bool shouldShowNbProducts) {
         // Ajouter le nom du rayon et le nombre de produits dans le tableau
         nomRayons[rayonCourant + 1] = rayons->nom_rayon;
         if(shouldShowNbProducts){
-            char *nbProduitsStr = malloc(sizeof(char) * 9); // Allouer de la mémoire pour la chaîne
+            nbProduitsStr = malloc(sizeof(char) * 9); // Allouer de la mémoire pour la chaîne
             sprintf(nbProduitsStr, "%d", nbProduits);
             nbProduitsParRayon[rayonCourant + 1] = nbProduitsStr;
         }
@@ -592,23 +530,21 @@ void afficherMagasinGenerique(T_Magasin *magasin, bool shouldShowNbProducts) {
     if(shouldShowNbProducts) nbProduitsParRayon[rayonCourant + 1] = NULL;
 
 
-    // TODO : rendre cette partie plus élégante 
-    // (j'ai essayé un opérateur ternaire pour l'assignation de valeur à tableaux, mais ça ne fonctionne pas)
     if(shouldShowNbProducts) {
         char **tableaux[] = {nomRayons, nbProduitsParRayon, NULL};
         afficherTableau(tableaux);
+        free(nbProduitsStr);
     }
     else {
         char **tableaux[] = {nomRayons, NULL};
         afficherTableau(tableaux);
     }
 
+    return;
 }
-
 void afficherMagasin(T_Magasin *magasin) { 
     afficherMagasinGenerique(magasin, true); 
 }
-
 void afficherRayons(T_Magasin *magasin){ 
     afficherMagasinGenerique(magasin, false); 
 }
@@ -661,13 +597,14 @@ void afficherRayon(T_Rayon *rayon) {
 }
 
 
+
 /* ******************************
  * Vérifie si le magasin existe
  ****************************** */
-bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
-    bool isStoreSet = (bool) magasin;
+bool isMagasinSet(T_Magasin *magasin, bool shouldWarnUser) {
+    bool isMagasinSet = (bool) magasin;
 
-    if(! isStoreSet) {
+    if(! isMagasinSet) {
         if(shouldWarnUser) printf("\nAucun magasin n'existe ! ");
         return false;
     }
@@ -676,11 +613,12 @@ bool isStoreSet(T_Magasin *magasin, bool shouldWarnUser) {
 }
 
 
+
 /* *********************************************************
  * Vérifie si, au sein du magasin, au moins un rayon existe
  ******************************************************** */
-bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser) {
-    if(! isStoreSet(magasin, shouldWarnUser)) return false; // Juste au cas oé, on vérifie que le magasin soit bien défini.
+bool isAnyRayonSet(T_Magasin *magasin, bool shouldWarnUser) {
+    if(! isMagasinSet(magasin, shouldWarnUser)) return false; // Juste au cas oé, on vérifie que le magasin soit bien défini.
                                                             // Si pas de magasin => pas de rayon
 
     if(magasin->liste_rayons == NULL) {
@@ -690,6 +628,7 @@ bool isAnyDeptSet(T_Magasin *magasin, bool shouldWarnUser) {
 
     return true;
 }
+
 
 
 /* **************************************
@@ -782,9 +721,9 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
     T_Rayon *rayon_current = magasin->liste_rayons;
     T_Produit *produit_current;
 
-    T_Rayon_Temp *rayontemp = NULL; // Téte de la liste éé afficher
+    T_Rayon_Temp *rayontemp = NULL; // Téte de la liste à afficher
     rayontemp = malloc(sizeof(T_Rayon_Temp));
-    rayontemp->designation = malloc(strlen("-1") + 1); // On initialise éé -1 pour savoir s'il est vide ou pas
+    rayontemp->designation = malloc(strlen("-1") + 1); // On initialise à -1 pour savoir s'il est vide ou pas
     strcpy(rayontemp->designation, "-1");
     rayontemp->suivant = NULL;
 
@@ -858,7 +797,7 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
     afficherTableau(tableaux);
 
 
-    // On libére la mémoire du rayon temporaire créé
+    // On libére la mémoire du rayon temporaire crà
     produitsTemp = rayontemp;
     while (produitsTemp != NULL)
     {   
@@ -871,6 +810,8 @@ void rechercheProduits(T_Magasin *magasin, float prix_min, float prix_max) {
     }
     free(produitsTemp);
 }
+
+
 
 /* *********************
  * Fusionner deux rayons
@@ -891,9 +832,9 @@ void fusionnerRayons(T_Magasin *magasin) {
         return;
     }
 
-    // Identification des rayons éé fusionner
-    T_Rayon *rayon_1 = getDeptByName(magasin, nom_rayon_1, true);
-    T_Rayon *rayon_2 = getDeptByName(magasin, nom_rayon_2, true);
+    // Identification des rayons à fusionner
+    T_Rayon *rayon_1 = getRayonParNom(magasin, nom_rayon_1, true);
+    T_Rayon *rayon_2 = getRayonParNom(magasin, nom_rayon_2, true);
     
     T_Produit *prayon_1 = rayon_1->liste_produits;
     T_Produit *prayon_2 = rayon_2->liste_produits;
@@ -906,43 +847,21 @@ void fusionnerRayons(T_Magasin *magasin) {
 
     // Création et identification du nouveau rayon
     ajouterRayon(magasin, nom_resultant);
-    T_Rayon *rayon_resultant = getDeptByName(magasin, nom_resultant, true);
+    T_Rayon *rayon_resultant = getRayonParNom(magasin, nom_resultant, true);
 
-    // Regarder si un des rayons est vide
 
-    
-    // Juste pour regrouper les cas particuliers avec if..else
-    // TODO : virer le gros if, de set des flag dans les petits else if (que tu peux transformes en if) 
-    // TODO : et le gros else (celui juste après ce sreen) se transforme en  if declenché par le flag
-    if ((prayon_1 == NULL && prayon_2 == NULL) || (prayon_1 != NULL && prayon_2 == NULL) || (prayon_1 == NULL && prayon_2 != NULL))
-    {
-        if (prayon_1 == NULL && prayon_2 == NULL)
-        {
-            // on ne fait rien; éé la fin on supprime les 2 rayons et on laisse juste le nouveau
-        }
-
-        else if (prayon_1 != NULL && prayon_2 == NULL)
-        {
-            rayon_resultant->liste_produits = prayon_1;
-        }
-
-        else if (prayon_1 == NULL && prayon_2 != NULL)
-        {
-            rayon_resultant->liste_produits = prayon_2;
-        }
+    // Fusion des rayons
+    if(prayon_1 == NULL ^ prayon_2 == NULL) { // cas particulier ; l'un des 2 rayons est inexistant, mais pas les deux
+        rayon_resultant->liste_produits = (prayon_1 != NULL) ? prayon_1 : prayon_2;
     }
 
-    else 
-    {
-        // Marquer le début du rayon avec le produit le moins cher
-        if (prayon_1->prix >= prayon_2->prix)
-        {
+    else { // cas général ; les 2 rayons existent
+        
+        if (prayon_1->prix >= prayon_2->prix) { // Marquer le début du rayon avec le produit le moins cher
             rayon_resultant->liste_produits = prayon_2;
             prayon_2 = prayon_2->suivant;
-        }
-
-        else
-        {
+        } 
+        else {
             rayon_resultant->liste_produits = prayon_1;
             prayon_1 = prayon_1->suivant;
         }
@@ -951,35 +870,25 @@ void fusionnerRayons(T_Magasin *magasin) {
 
         while (prayon_1 != NULL && prayon_2 != NULL)
         {
-            if (prayon_1->prix >= prayon_2->prix)
-            {   
+            if(prayon_1->prix >= prayon_2->prix) {   
                 buffer->suivant = prayon_2;
                 buffer = prayon_2;
                 prayon_2 = prayon_2->suivant;
             }
 
-            else
-            {
+            else {
                 buffer->suivant = prayon_1;
                 buffer = prayon_1;
                 prayon_1 = prayon_1->suivant;
             }
         }
 
-        if (prayon_1 == NULL && prayon_2 != NULL)
-        {
-            buffer->suivant = prayon_2;
-        }
-
-        if (prayon_1 != NULL && prayon_2 == NULL)
-        {
-            buffer->suivant = prayon_1;
-        }
+        buffer->suivant = (prayon_1 != NULL) ? prayon_1 : prayon_2;
     }
 
-    // Dans TOUS LES CAS:
+    // DANS TOUS LES CAS :
     // On supprime ces rayons
-    // Ils vont quand méme pointer sur le premier produit, on met NULL pour pas supprimer les produits avec
+    // Ils vont quand méme pointer sur le premier produit, on met NULL pour ne pas supprimer les produits avec
     rayon_1->liste_produits = NULL;
     rayon_2->liste_produits = NULL;
 
@@ -992,5 +901,3 @@ void fusionnerRayons(T_Magasin *magasin) {
     free(nom_rayon_2);
     free(nom_resultant);
 }
-
-
