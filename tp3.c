@@ -267,7 +267,7 @@ T_Rayon *getRayonParNom(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser)
     if(shouldWarnUser) alert_leRayonNExistePas(nomRayon);
     return NULL;
 }
-bool isDeptSet(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
+bool isRayonSet(T_Magasin *magasin, char *nomRayon, bool shouldWarnUser) {
     if(! isAnyRayonSet(magasin, shouldWarnUser)) return false;   // Juste au cas oé, on vérifie qu'au moins un rayon soit bien défini.
 
     T_Rayon *rayon = getRayonParNom(magasin, nomRayon, false);
@@ -805,7 +805,7 @@ void fusionnerRayons(T_Magasin *magasin) {
         return;
     }
 
-    if ( (!isDeptSet(magasin, nom_rayon_1, true)) || (!isDeptSet(magasin, nom_rayon_2, true)) ){
+    if ( (!isRayonSet(magasin, nom_rayon_1, true)) || (!isRayonSet(magasin, nom_rayon_2, true)) ){
         printf("ERREUR: Au moins l'un des rayons est inexistant.");
         return;
     }

@@ -175,7 +175,7 @@ int main(void)
                 afficherRayon(rayonDuProduitASupprimer);
                 char *nomProduitASupprimer = getStringInput("\nNom du produit ? ");
 
-                if (isDeptSet(mon_magasin, nomRayonDuProduitASupprimer, true)){
+                if (isRayonSet(mon_magasin, nomRayonDuProduitASupprimer, true)){
                     T_Rayon *rayons = getRayonParNom(mon_magasin, nomRayonDuProduitASupprimer, true);
                     supprimerProduit(rayons, nomProduitASupprimer);
                 }
@@ -188,7 +188,7 @@ int main(void)
             {
                 char *nomRayonASupprimer = getStringInput("\nNom du rayon ? ");
 
-                if (isDeptSet(mon_magasin, nomRayonASupprimer, true)){
+                if (isRayonSet(mon_magasin, nomRayonASupprimer, true)){
                     supprimerRayon(mon_magasin, nomRayonASupprimer);
                 }
 
