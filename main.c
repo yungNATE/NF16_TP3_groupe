@@ -33,27 +33,6 @@ int main(void)
         printf("\nChoix %c s‚lectionn‚ \n", choix);
 
 
-        
-        char *choixNecessitantMagDefini     = "2";           // la liste des choix n‚cessitant de v‚rifier (seulement) si mon_magasin a ‚t‚ initialis‚
-        char *choixNecessitantUnRayonDefini =  "3456789";    // La liste des choix n‚cessitant de v‚rifier si au moins un rayon a ‚t‚ initialis‚.
-                                                             // (NB : Si aucun magasin n'est d‚fini, alors isAnyRayonSet() l'indiquera de toute faÃ§on dans la console)
-
-        // Pour ‚viter la redondance de isMagasinSet() & isAnyRayonSet() dans le switch on pr‚-conditionne
-        // (Permet d'afficher des messages d'erreur pr‚cis Ã  l'utilisateur)
-        if (isCharInArray(choix, choixNecessitantMagDefini)){ 
-            // Si aucun magasin n'existe pour les choixNecessitantMagDefini
-            if(! isMagasinSet(mon_magasin, true)) {
-                continue;
-            }
-        }
-
-        if (isCharInArray(choix, choixNecessitantUnRayonDefini)) {
-            // Si aucun rayon n'existe pour les choixNecessitantUnRayonDefini
-            if(! isAnyRayonSet(mon_magasin, true)) {
-                continue;
-            }
-        }
-
         switch (choix) {
             case '0' :
                 printf("\n======== PROGRAMME TERMINE ========\n");
@@ -91,6 +70,10 @@ int main(void)
 
             case '2' : // Ajouter rayon
             {
+                if(! isMagasinSet(mon_magasin, true)) {
+                    continue;
+                }
+
                 // R‚cup‚ration de l'input
                 char *nomRayon = getStringInput("\nNom du rayon ? ");
 
@@ -157,6 +140,7 @@ int main(void)
             case '6' : // Supprimer produit
             {   
                 afficherRayons(mon_magasin);
+
                 char *nomRayonDuProduitASupprimer = getStringInput("\nNom du rayon ? ");
 
                 T_Rayon *rayonDuProduitASupprimer = getRayonParNom(mon_magasin, nomRayonDuProduitASupprimer, true);
@@ -186,6 +170,10 @@ int main(void)
             }
             case '7' : // Supprimer rayon
             {
+                if(! isAnyRayonSet(mon_magasin, true)) {
+                    continue;
+                }
+
                 char *nomRayonASupprimer = getStringInput("\nNom du rayon ? ");
 
                 if (isRayonSet(mon_magasin, nomRayonASupprimer, true)){
@@ -197,6 +185,10 @@ int main(void)
             }
             case '8' : // Rechercher produit par prix
             {
+                if(! isAnyRayonSet(mon_magasin, true)) {
+                    continue;
+                }
+
                 float prix_min = getFloatInput("\nPrix minimal du produit ? ");
                 float prix_max = getFloatInput("\nPrix maximal du produit ? ");
                 

@@ -61,16 +61,6 @@ void viderBuffer() {
 void replaceNewLine_WithNullTerminator(char *str) {
     str[strcspn(str, "\n")] = '\0';
 }
-bool isCharInArray(char c, char *array) {
-    int i = 0;
-    while (array[i] != '\0') {
-        if (array[i] == c) {
-            return true;
-        }
-        i++;
-    }
-    return false;
-}
 char *getCaractereRepete(int nbCaracteres, char car) {
     if(nbCaracteres <= 0) return "";
     // Allouer de la mémoire pour la chaéne de caractéres
@@ -125,6 +115,7 @@ void afficherTableau(char ***tableaux) {
 
     if(nbMax_rangees == 0) return; // Les tableaux insérés dans tableaux[] sont vides | EX : tableaux == {{NULL}, {NULL}, {NULL}}
 
+
     //* Affichage du tableau
     const char charLigne   = '-';
     const char charCoin    = '+';
@@ -136,12 +127,15 @@ void afficherTableau(char ***tableaux) {
         printf("Erreur : impossible d'allouer de la mémoire.\n");
         exit(1);
     }
+
     int pos = 0;
     ligne[pos++] = charCoin;
+
     for (i = 0; i < nb_colonnes; i++) {
         pos += sprintf(&ligne[pos], "%s", getCaractereRepete(largeur_colonne[i] + 2, '-'));
         ligne[pos++] = charCoin;
     }
+
     ligne[pos++] = '\n';
     ligne[pos] = '\0';
 
@@ -151,8 +145,10 @@ void afficherTableau(char ***tableaux) {
     // Affichage des entêtes de colonne
     printf("%c", charColonne);
     for (i = 0; i < nb_colonnes; i++) {
-        printf(" %-*s |", largeur_colonne[i], tableaux[i][0]);
         // comprendre %-*s : https://stackoverflow.com/questions/23776824/what-is-the-meaning-of-s-in-a-printf-format-string 
+        printf(" %-*s ", largeur_colonne[i], tableaux[i][0]);
+        printf("%c", charColonne);
+        
     }
     printf("\n");
 
@@ -160,17 +156,20 @@ void afficherTableau(char ***tableaux) {
     printf("%s", ligne);
 
 
-    // Affichage du contenu de la colonne
+    // Affichage du contenu des lignes
     for (i = 0; i < nbMax_rangees - 1; i++) {
         printf("%c", charColonne);
+        
         for (j = 0; j < nb_colonnes; j++) {
 
             if( tableaux[j][i+1] == NULL || i >= hauteur_colonnes[j] ) { // si on sort des valeurs de la colonnes courante (AKA si on atteint ou dépasse NULL)
-                printf(" %-*s |", largeur_colonne[j], "");
+                printf(" %-*s ", largeur_colonne[j], "");
+                printf("%c", charColonne);
                 continue;
             } 
 
-            printf(" %-*s |", largeur_colonne[j], tableaux[j][i+1]);
+            printf(" %-*s ", largeur_colonne[j], tableaux[j][i+1]);
+            printf("%c", charColonne);
         }
         printf("\n");
     }
@@ -293,9 +292,8 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
         rayonCourant = rayonCourant->suivant;
     }
 
-    // Test si rayon existe déjé
-    if (rayonCourant != NULL && strcmp(rayonCourant->nom_rayon, nomRayon) == 0)
-    {
+    // Test si rayon existe déjà
+    if (rayonCourant != NULL && strcmp(rayonCourant->nom_rayon, nomRayon) == 0) {
         printf("Le rayon %s existe déjà.\n", nomRayon);
         return 0;
     }
@@ -304,10 +302,8 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
 
     T_Rayon *nouveauRayon = creerRayon(nomRayon);
 
-    if(rayonPrecedent == NULL)
-        magasin->liste_rayons = nouveauRayon;
-    else
-        rayonPrecedent->suivant = nouveauRayon;
+    if(rayonPrecedent == NULL)  magasin->liste_rayons = nouveauRayon;
+    else                        rayonPrecedent->suivant = nouveauRayon;
 
     nouveauRayon->suivant = rayonCourant; // Pour bien marquer la fin
 
@@ -327,55 +323,57 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
     //* Vérification si le produit existe déjà dans le rayon
     T_Produit *produit = rayon->liste_produits;
     while (produit != NULL) {
-        if (strcmp(produit->designation, designation) == 0) {
-
-            // Le produit existe déjà, on augmente simplement sa quantite et demande si prix modifie ou pas
-            printf("Un produit avec le méme nom existe déjà.\n");
-            printf("Vouz aurez le choix entre augmenter sa quantité et/ou modifier son prix si vous avez rentré un prix différent de l'ancien.\n");
-            printf("Si vous souhaitez le remplacer avec la nouvelle quantité et prix, supprimez-le et créez-en un nouveau.\n");
-
-            // Incrémentation de la quentité
-            char reponse = 'n'; // Intialisation
-            do
-            {
-                if(reponse != 'o' && reponse != 'n') 
-                {
-                    printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse ! ");
-                }
-                printf("\nVoulez-vous augmenter sa quantité ? (o/n) ");
-                reponse = getchar();
-                viderBuffer();
-            } while (reponse != 'o' && reponse != 'n'); 
-
-            if(reponse == 'o') { produit->quantite_en_stock += quantite; }
-
-            // Changement du prix
-            if (prix == produit->prix) { return 0; }
-
-            reponse = 'n'; // Intialisation
-            do
-            {
-                if(reponse != 'o' && reponse != 'n') 
-                {
-                    printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse !\n ");
-                }
-                printf("Souhaitez-vous modifier son prix, actuellement de %.2f (o/n) ? ", produit->prix);
-                reponse = getchar();
-                viderBuffer();
-            } while (reponse != 'o' && reponse != 'n');
-
-            if (reponse == 'o') // On supprime le produit et insere avec qté augmentée et prix différent pour avoir la liste encore triée
-            {   
-                int stockancien = produit->quantite_en_stock;
-                int testsupprim, testajout;
-                testsupprim = supprimerProduit(rayon, designation);
-                testajout = ajouterProduit(rayon, designation, prix, stockancien);
-
-                return (testsupprim == 1 && testajout == 1);
-            }
-
-            else if(reponse == 'n') { return 1; }
+        if (strcmp(produit->designation, designation) != 0) { // Tant que le produit n'est pas trouvé
+            produit = produit->suivant;
+            continue;
         }
+
+        // Le produit existe déjà, on augmente simplement sa quantite et demande si prix modifie ou pas
+        printf("Un produit avec le même nom existe déjà.\n");
+        printf("Vouz aurez le choix entre augmenter sa quantité et/ou modifier son prix si vous avez rentré un prix différent de l'ancien.\n");
+        printf("Si vous souhaitez le remplacer avec la nouvelle quantité et prix, supprimez-le et créez-en un nouveau.\n");
+
+        // Incrémentation de la quentité
+        char reponse = 'n'; // Intialisation
+        do
+        {
+            if(reponse != 'o' && reponse != 'n') 
+            {
+                printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse ! ");
+            }
+            printf("\nVoulez-vous augmenter sa quantité ? (o/n) ");
+            reponse = getchar();
+            viderBuffer();
+        } while (reponse != 'o' && reponse != 'n'); 
+
+        if(reponse == 'o') { produit->quantite_en_stock += quantite; }
+
+        // Changement du prix
+        if (prix == produit->prix) { return 0; }
+
+        reponse = 'n'; // Intialisation
+        do
+        {
+            if(reponse != 'o' && reponse != 'n') 
+            {
+                printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse !\n ");
+            }
+            printf("Souhaitez-vous modifier son prix, actuellement de %.2f (o/n) ? ", produit->prix);
+            reponse = getchar();
+            viderBuffer();
+        } while (reponse != 'o' && reponse != 'n');
+
+        if (reponse == 'o') // On supprime le produit et insere avec qté augmentée et prix différent pour avoir la liste encore triée
+        {   
+            int stockancien = produit->quantite_en_stock;
+            int testsupprim, testajout;
+            testsupprim = supprimerProduit(rayon, designation);
+            testajout = ajouterProduit(rayon, designation, prix, stockancien);
+
+            return (testsupprim == 1 && testajout == 1);
+        }
+
+        else if(reponse == 'n') { return 1; }
 
         produit = produit->suivant;
     }
@@ -482,6 +480,8 @@ void afficherMagasinGenerique(T_Magasin *magasin, bool shouldShowNbProducts) {
     int rayonCourant = 0;
     while (rayons != NULL) {
 
+        // Ajouter le nom du rayon et le nombre de produits dans le tableau
+        nomRayons[rayonCourant + 1] = rayons->nom_rayon;
         if(shouldShowNbProducts){
             // récupérer le nombre de produits dans le rayon
             nbProduits = 0;
@@ -490,11 +490,8 @@ void afficherMagasinGenerique(T_Magasin *magasin, bool shouldShowNbProducts) {
                 nbProduits++;
                 produit = produit->suivant;
             }
-        }
 
-        // Ajouter le nom du rayon et le nombre de produits dans le tableau
-        nomRayons[rayonCourant + 1] = rayons->nom_rayon;
-        if(shouldShowNbProducts){
+            // Ajout
             nbProduitsStr = malloc(sizeof(char) * 9); // Allouer de la mémoire pour la chaîne
             sprintf(nbProduitsStr, "%d", nbProduits);
             nbProduitsParRayon[rayonCourant + 1] = nbProduitsStr;
@@ -580,9 +577,7 @@ void afficherRayon(T_Rayon *rayon) {
  * Vérifie si le magasin existe
  ****************************** */
 bool isMagasinSet(T_Magasin *magasin, bool shouldWarnUser) {
-    bool isMagasinSet = (bool) magasin;
-
-    if(! isMagasinSet) {
+    if(magasin == NULL) {
         if(shouldWarnUser) printf("\nAucun magasin n'existe ! ");
         return false;
     }
@@ -596,8 +591,8 @@ bool isMagasinSet(T_Magasin *magasin, bool shouldWarnUser) {
  * Vérifie si, au sein du magasin, au moins un rayon existe
  ******************************************************** */
 bool isAnyRayonSet(T_Magasin *magasin, bool shouldWarnUser) {
-    if(! isMagasinSet(magasin, shouldWarnUser)) return false; // Juste au cas oé, on vérifie que le magasin soit bien défini.
-                                                            // Si pas de magasin => pas de rayon
+    if(! isMagasinSet(magasin, shouldWarnUser)) return false;   // Juste au cas où, on vérifie que le magasin soit bien défini.
+                                                                // Si pas de magasin => pas de rayon
 
     if(magasin->liste_rayons == NULL) {
         if(shouldWarnUser) printf("\nAucun rayon n'existe ! ");

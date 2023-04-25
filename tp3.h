@@ -99,12 +99,10 @@ void alert_leRayonNExistePas(char *nomRayonRecherche); // wrapper d'un printf() 
 void afficherTableau(char ***tableaux); // Affichage d'un tableau
 
     // func
+char *getCaractereRepete(int nbCaracteres, char separateur); // Affiche caractère de séparation d'un tableau affiché
+
 char *getStringInput(char *prompt); // Les fonctions getTypeInput() permettent de s'assurer qu'on input bien le type recherché
 float getFloatInput(char *prompt);
 int getIntInput(char *prompt);
-
-bool isCharInArray(char c, char *array); // Test la présence d'un char au sein d'un tableau
-char *getCaractereRepete(int nbCaracteres, char separateur); // Affiche caractère de séparation d'un tableau affiché
-
 
 #endif // TP3_H_INCLUDED
