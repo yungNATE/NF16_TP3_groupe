@@ -322,20 +322,19 @@ int ajouterRayon(T_Magasin *magasin, char *nomRayon) {
  * Ajout d'un produit dans un rayon
  ******************************** */
 int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
-    if(quantite <= 0) {
-        return 0;
-    }
+    if(quantite <= 0) { return 0; }
 
-    //* Vérification si le produit existe déjé dans le rayon
+    //* Vérification si le produit existe déjà dans le rayon
     T_Produit *produit = rayon->liste_produits;
     while (produit != NULL) {
         if (strcmp(produit->designation, designation) == 0) {
 
-            // Le produit existe déjé, on augmente simplement sa quantite et demande si prix modifie ou pas
-            printf("Un produit avec le méme nom existe déjé.\n");
+            // Le produit existe déjà, on augmente simplement sa quantite et demande si prix modifie ou pas
+            printf("Un produit avec le méme nom existe déjà.\n");
             printf("Vouz aurez le choix entre augmenter sa quantité et/ou modifier son prix si vous avez rentré un prix différent de l'ancien.\n");
             printf("Si vous souhaitez le remplacer avec la nouvelle quantité et prix, supprimez-le et créez-en un nouveau.\n");
 
+            // Incrémentation de la quentité
             char reponse = 'n'; // Intialisation
             do
             {
@@ -348,55 +347,34 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
                 viderBuffer();
             } while (reponse != 'o' && reponse != 'n'); 
 
-            if(true) 
+            if(reponse == 'o') { produit->quantite_en_stock += quantite; }
+
+            // Changement du prix
+            if (prix == produit->prix) { return 0; }
+
+            reponse = 'n'; // Intialisation
+            do
             {
-                produit->quantite_en_stock += quantite;
-                if (prix != produit->prix)
+                if(reponse != 'o' && reponse != 'n') 
                 {
-                    reponse = 'n'; // Intialisation
-                    do
-                    {
-                        if(reponse != 'o' && reponse != 'n') 
-                        {
-                            printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse !\n ");
-                        }
-                        printf("Souhaitez-vous modifier son prix (o/n) ? Ancien prix: %f\n", produit->prix);
-                        reponse = getchar();
-                        viderBuffer();
-                    } while (reponse != 'o' && reponse != 'n');
-
-                    if (reponse == 'o') // On supprime le produit et insere avec qté augmentée et prix différent pour avoix la liste encore triée
-                    {   
-                        int stockancien = produit->quantite_en_stock;
-                        int testsupprim, testajout;
-                        testsupprim = supprimerProduit(rayon, designation);
-                        testajout = ajouterProduit(rayon, designation, prix, stockancien);
-
-                        if (testsupprim == 1 && testajout == 1) // Si tout est ok
-                        {
-                            return 1;
-                        }
-
-                        else
-                        {
-                            return 0;
-                        }
-                    }
-
-                    else
-                    {
-                        return 1;
-                    }
+                    printf("\nERREUR : seulement 'o' et 'n' sont acceptés en réponse !\n ");
                 }
+                printf("Souhaitez-vous modifier son prix, actuellement de %.2f (o/n) ? ", produit->prix);
+                reponse = getchar();
+                viderBuffer();
+            } while (reponse != 'o' && reponse != 'n');
 
-                return 1;
+            if (reponse == 'o') // On supprime le produit et insere avec qté augmentée et prix différent pour avoir la liste encore triée
+            {   
+                int stockancien = produit->quantite_en_stock;
+                int testsupprim, testajout;
+                testsupprim = supprimerProduit(rayon, designation);
+                testajout = ajouterProduit(rayon, designation, prix, stockancien);
+
+                return (testsupprim == 1 && testajout == 1);
             }
 
-            else if(reponse == 'n')
-            {
-                return 0;
-            }
-            
+            else if(reponse == 'n') { return 1; }
         }
 
         produit = produit->suivant;
@@ -418,13 +396,12 @@ int ajouterProduit(T_Rayon *rayon,char *designation, float prix, int quantite) {
     }
 
     // On vient de dépasser le dernier produit au prix < au prix courant. On insére 
-    if(produitPrecedent == NULL)
-    {
+    if(produitPrecedent == NULL) {
         nouveauProduit->suivant = rayon->liste_produits;
         rayon->liste_produits = nouveauProduit;
     }
 
-    else produitPrecedent->suivant = nouveauProduit;
+    else { produitPrecedent->suivant = nouveauProduit; }
 
     nouveauProduit->suivant = produitCourant; // Pour bien marquer la fin
 
@@ -440,14 +417,15 @@ void ajouterProduit_RayonTemp(T_Rayon_Temp **rayontemp, char *designation, float
 
     // Si la liste est vide, càd designation = "-1" on ajoute directement le produit
     if (strcmp((*rayontemp)->designation, "-1") == 0) {
-    (*rayontemp)->designation = malloc(strlen(designation) + 1);
-    strcpy((*rayontemp)->designation, designation);
-    (*rayontemp)->prix = prix;
-    (*rayontemp)->quantite_en_stock = quantite;
-    (*rayontemp)->rayon = malloc(strlen(nom_rayon) + 1);
-    strcpy((*rayontemp)->rayon, nom_rayon);
-    (*rayontemp)->suivant = NULL;
-    return;
+        (*rayontemp)->designation = malloc(strlen(designation) + 1);
+        strcpy((*rayontemp)->designation, designation);
+        (*rayontemp)->prix = prix;
+        (*rayontemp)->quantite_en_stock = quantite;
+        (*rayontemp)->rayon = malloc(strlen(nom_rayon) + 1);
+        strcpy((*rayontemp)->rayon, nom_rayon);
+        (*rayontemp)->suivant = NULL;
+        
+        return;
     }
 
     // Sinon tant qu'on trouve un prix inférieur au produit courant, on avance dans le rayon 
