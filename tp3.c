@@ -499,7 +499,7 @@ void afficherMagasinGenerique(T_Magasin *magasin, bool shouldShowNbProducts) {
 
         rayons = rayons->suivant;
         rayonCourant++;
-    }
+    } 
 
     nomRayons[rayonCourant + 1] = NULL;
     if(shouldShowNbProducts) nbProduitsParRayon[rayonCourant + 1] = NULL;
@@ -824,7 +824,7 @@ void fusionnerRayons(T_Magasin *magasin) {
 
 
     // Fusion des rayons
-    if(prayon_1 == NULL ^ prayon_2 == NULL) { // cas particulier ; l'un des 2 rayons est inexistant, mais pas les deux
+    if(prayon_1 == NULL ^ prayon_2 == NULL) { // cas particulier ; l'un des 2 rayons est inexistant
         rayon_resultant->liste_produits = (prayon_1 != NULL) ? prayon_1 : prayon_2;
     }
 
